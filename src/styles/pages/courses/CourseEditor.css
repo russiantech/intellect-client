@@ -1,0 +1,184 @@
+/* ═══════════════════════════════════════════════════════════
+   CourseEditor / Quiz Builder / Project Brief — CSS
+   Append to your main app stylesheet or a dedicated
+   studio.css / creator.css file.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Topic quiz builder trigger ─────────────────────────── */
+.topic-quiz-builder { display: inline-flex; position: relative; }
+
+/* ─── Quiz builder panel (inline dropdown) ────────────────── */
+.quiz-builder-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: min(640px, 96vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--surface, #16161f);
+  border: 1px solid var(--border, #2a2a3a);
+  border-radius: 0.85rem;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  z-index: 400;
+  padding: 0;
+}
+
+/* Scrollbar */
+.quiz-builder-panel::-webkit-scrollbar { width: 5px; }
+.quiz-builder-panel::-webkit-scrollbar-thumb { background: var(--border, #2a2a3a); border-radius: 5px; }
+
+.quiz-builder-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border, #2a2a3a);
+  position: sticky; top: 0;
+  /* background: var(--surface, #16161f); */
+  z-index: 1;
+}
+
+/* Settings row */
+.quiz-builder-settings {
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+  padding: 0.85rem 1rem 0.5rem;
+}
+.quiz-builder-settings > div { display: flex; flex-direction: column; }
+
+/* AI gen row */
+.quiz-ai-gen-row {
+  display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;
+  padding: 0.6rem 1rem;
+  background: rgba(124,106,247,0.06);
+  border-top: 1px solid var(--border, #2a2a3a);
+  border-bottom: 1px solid var(--border, #2a2a3a);
+  font-size: 0.8rem;
+}
+
+/* Questions list */
+.quiz-questions-list { padding: 0.75rem 1rem; }
+
+.quiz-question-editor {
+  border: 1px solid var(--border, #2a2a3a);
+  border-radius: 0.65rem;
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+  background: var(--card-bg, #1a1a24);
+}
+
+/* MCQ options editor */
+.quiz-options-editor { padding-left: 0.5rem; }
+
+/* ─── Project Brief section ───────────────────────────────── */
+.project-brief-section {
+  border: 1px dashed var(--border, #2a2a3a);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+}
+.project-brief-form { }
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .quiz-builder-panel {
+    position: fixed;
+    top: 10vh; left: 2vw; right: 2vw; width: auto;
+    max-height: 82vh;
+  }
+  .quiz-builder-settings { flex-direction: column; }
+  .quiz-ai-gen-row { flex-wrap: wrap; gap: 0.5rem; }
+}
+
+
+
+
+/* v2 */
+/* ═══════════════════════════════════════════
+   Step Pills — Equal width, scrollable on mobile
+   ═══════════════════════════════════════════ */
+
+.step-pills-scroll {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: none;          /* Firefox */
+  -webkit-overflow-scrolling: touch;
+}
+.step-pills-scroll::-webkit-scrollbar { display: none; }
+
+/* Equal-width pills that fill container */
+.step-pill {
+  white-space: nowrap;
+  flex: 1 1 0;                    /* Grow equally, shrink equally, basis 0 */
+  min-width: 0;                   /* Allow shrinking below content width */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;        /* Center content when stretched */
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.85rem;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+/* On narrow screens: revert to scrollable non-equal pills */
+@media (max-width: 640px) {
+  .step-pill {
+    flex: 0 0 auto;               /* Don't grow/shrink, size to content */
+    min-width: max-content;         /* At least as wide as content */
+  }
+}
+
+.step-pill-num {
+  font-weight: 700;
+  font-size: 0.7rem;
+  opacity: 0.65;
+}
+.btn-primary  .step-pill-num,
+.btn-success  .step-pill-num { opacity: 0.8; }
+
+
+/* v2 */
+/* container */
+.step-indicator {
+  width: 100%;
+}
+
+/* scroll wrapper */
+.step-scroll {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding-bottom: 4px;
+
+  /* smooth scroll feel */
+  scroll-behavior: smooth;
+
+  /* hide ugly scrollbar (optional) */
+  scrollbar-width: none; /* Firefox */
+}
+.step-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* step buttons */
+.step-dot {
+  flex: 0 0 auto; /* 🔑 prevents shrinking */
+  border: none;
+  background: #f1f3f5;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+/* states */
+.step-dot.active {
+  background: var(--bs-primary);
+  color: #fff;
+}
+
+.step-dot.done {
+  background: #d1e7dd;
+  color: #0f5132;
+}

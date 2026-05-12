@@ -1,0 +1,1510 @@
+/* ═══════════════════════════════════════════════════════════
+   LearnPage.css — scoped to the course learning page
+   Sections:
+     1.  Root layout (3-panel grid)
+     2.  Mobile top-bar
+     3.  Content sidebar (left panel)
+     4.  Lesson & topic timeline
+     5.  Main content player
+     6.  Media wrappers: video, PDF, image, file, audio, prose
+     7.  Content protection — overlay & CSS guards
+     8.  AI chat panel (right)
+     9.  Drawers & overlay (mobile)
+    10.  Responsive breakpoints
+   ═══════════════════════════════════════════════════════════ */
+
+
+/* ─── 1. Root layout ────────────────────────────────────── */
+
+.learn-root {
+  display: grid;
+  grid-template-columns: 280px 1fr 0px;
+  grid-template-rows: 1fr;
+  grid-template-areas: "sidebar main ai";
+  height: calc(100vh - var(--nav-height, 60px));
+  overflow: hidden;
+  background: var(--bg, #0f0f13);
+  transition: grid-template-columns 0.28s ease;
+}
+
+.learn-root.ai-open {
+  grid-template-columns: 280px 1fr 340px;
+}
+
+
+/* ─── 2. Mobile top-bar ─────────────────────────────────── */
+
+.learn-topbar {
+  display: none;
+  grid-area: topbar;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  height: 52px;
+  min-height: 52px;
+  border-bottom: 1px solid var(--border, #2a2a3a);
+  background: var(--card-bg, #1a1a24);
+  gap: 0.5rem;
+}
+
+.learn-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.learn-topbar-back {
+  background: none;
+  border: none;
+  padding: 0.3rem;
+  cursor: pointer;
+  color: var(--text-muted, #888);
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.learn-topbar-back:hover { color: var(--text, #eee); }
+
+.learn-topbar-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text, #eee);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.learn-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.learn-topbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--border, #3a3a4e);
+  background: var(--card-bg, #1a1a24);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted, #aaa);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.learn-topbar-btn:hover,
+.learn-topbar-btn.active {
+  border-color: var(--primary, #7c6af7);
+  color: var(--primary, #7c6af7);
+}
+
+
+/* ─── 3. Content sidebar ────────────────────────────────── */
+
+.learn-sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--border, #2a2a3a);
+  background: var(--card-bg, #1a1a24);
+}
+
+.learn-sidebar-info {
+  padding: 1rem 1.1rem 0.85rem;
+  border-bottom: 1px solid var(--border, #2a2a3a);
+  flex-shrink: 0;
+}
+
+.learn-sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-muted, #888);
+  text-decoration: none;
+  margin-bottom: 0.6rem;
+  transition: color 0.15s;
+}
+
+.learn-sidebar-back:hover { color: var(--primary, #7c6af7); }
+
+.learn-sidebar-course-title {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--text, #eee);
+  line-height: 1.35;
+  margin: 0 0 0.6rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.learn-progress-bar-wrap {
+  height: 4px;
+  background: var(--border, #2a2a3a);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+
+.learn-progress-bar-fill {
+  height: 100%;
+  background: var(--primary, #7c6af7);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+.learn-progress-label {
+  font-size: 0.7rem;
+  color: var(--primary, #7c6af7);
+  font-weight: 600;
+}
+
+.learn-lesson-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border, #2a2a3a) transparent;
+}
+
+.learn-lesson-list::-webkit-scrollbar { width: 4px; }
+.learn-lesson-list::-webkit-scrollbar-thumb {
+  background: var(--border, #2a2a3a);
+  border-radius: 4px;
+}
+
+
+/* ─── 4. Lesson & topic timeline ────────────────────────── */
+
+.lesson-group { margin-bottom: 0.25rem; }
+
+.lesson-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s;
+}
+
+.lesson-group-header:hover {
+  background: color-mix(in srgb, var(--primary, #7c6af7) 6%, transparent);
+}
+
+.lesson-num-circle {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--primary, #7c6af7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary, #7c6af7);
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.lesson-group-header:hover .lesson-num-circle,
+.lesson-group.has-active .lesson-num-circle {
+  background: color-mix(in srgb, var(--primary, #7c6af7) 14%, transparent);
+}
+
+.lesson-group-title {
+  flex: 1;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text, #eee);
+  line-height: 1.3;
+}
+
+.lesson-group-chevron {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  color: var(--text-muted, #666);
+  transition: transform 0.2s ease;
+}
+
+.lesson-group.open .lesson-group-chevron {
+  transform: rotate(180deg);
+}
+
+/* Topic timeline */
+.topic-timeline {
+  padding: 0 0.75rem 0.35rem calc(1.1rem + 9px);
+  display: flex;
+  flex-direction: column;
+}
+
+.topic-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.1rem 0.4rem 0.1rem 0;
+  border-radius: 0.35rem;
+  transition: background 0.12s;
+}
+
+.topic-row:hover {
+  background: color-mix(in srgb, var(--primary, #7c6af7) 6%, transparent);
+}
+
+.topic-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 12px;
+  padding-top: 0.35rem;
+}
+
+.topic-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--border-dark, #555);
+  border: 2px solid var(--border-dark, #555);
+  transition: background 0.15s, border-color 0.15s;
+  z-index: 1;
+}
+
+.topic-row.is-active .topic-dot,
+.topic-row.is-done .topic-dot {
+  background: var(--primary, #7c6af7);
+  border-color: var(--primary, #7c6af7);
+}
+
+.topic-line {
+  width: 2px;
+  flex: 1;
+  min-height: 14px;
+  background: var(--border, #2a2a3a);
+  margin-top: 2px;
+}
+
+.topic-row:last-child .topic-line { display: none; }
+
+.topic-label {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--text-muted, #888);
+  line-height: 1.45;
+  padding-bottom: 1rem;
+  transition: color 0.15s;
+}
+
+.topic-row.is-active .topic-label {
+  color: var(--primary, #7c6af7);
+  font-weight: 600;
+}
+
+.topic-row.is-done .topic-label {
+  color: var(--primary, #7c6af7);
+  opacity: 0.7;
+}
+
+.topic-duration {
+  font-size: 0.65rem;
+  color: var(--text-muted, #666);
+  margin-top: 0.15rem;
+  white-space: nowrap;
+}
+
+
+/* ─── 5. Main content player ────────────────────────────── */
+
+.learn-main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.learn-content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border, #2a2a3a) transparent;
+}
+
+.learn-content-scroll::-webkit-scrollbar { width: 5px; }
+.learn-content-scroll::-webkit-scrollbar-thumb {
+  background: var(--border, #2a2a3a);
+  border-radius: 4px;
+}
+
+.learn-content-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 3rem;
+}
+
+.learn-topic-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.learn-topic-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text, #eee);
+  margin: 0 0 0.3rem;
+  line-height: 1.3;
+}
+
+.learn-topic-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted, #888);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.learn-topic-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.learn-desc-card {
+  border-radius: 0.75rem;
+  border: 1px solid var(--border, #2a2a3a);
+  background: var(--card-bg, #1a1a24);
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.learn-desc-card h6 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #888);
+  margin-bottom: 0.6rem;
+}
+
+.learn-desc-card p {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--text, #ddd);
+  margin: 0;
+}
+
+.learn-complete-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.learn-done-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--success, #22c55e);
+}
+
+.learn-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 0.75rem;
+  color: var(--text-muted, #666);
+  text-align: center;
+  padding: 2rem;
+}
+
+.learn-empty-state i { font-size: 2.75rem; opacity: 0.4; }
+
+.learn-empty-state h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text, #ccc);
+  margin: 0;
+}
+
+.learn-empty-state p { font-size: 0.82rem; margin: 0; }
+
+
+/* ─── 6. Media wrappers ─────────────────────────────────── */
+
+.learn-video-wrap {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  aspect-ratio: 16 / 9;
+}
+
+.learn-video-wrap video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.learn-pdf-wrap {
+  margin-bottom: 1.25rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--border, #2a2a3a);
+}
+
+.learn-pdf-viewer {
+  width: 100%;
+  height: 560px;
+  border: none;
+  display: block;
+}
+
+.learn-image-wrap {
+  text-align: center;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.learn-image-wrap img {
+  max-width: 100%;
+  border-radius: 0.65rem;
+  max-height: 480px;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none; /* prevents right-click save on images */
+}
+
+.learn-file-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border, #2a2a3a);
+  background: var(--card-bg, #1a1a24);
+  margin-bottom: 1.25rem;
+}
+
+.learn-file-icon { font-size: 2rem; flex-shrink: 0; }
+
+.learn-file-info { flex: 1; min-width: 0; }
+
+.learn-file-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text, #eee);
+}
+
+.learn-file-type {
+  font-size: 0.75rem;
+  color: var(--text-muted, #888);
+}
+
+.learn-prose {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--text, #ddd);
+  margin-bottom: 1.25rem;
+  user-select: text; /* allow copy of prose — teachers expect this */
+}
+
+.learn-prose h1,
+.learn-prose h2,
+.learn-prose h3 { color: var(--text, #eee); margin-top: 1.5em; }
+
+.learn-prose a { color: var(--primary, #7c6af7); }
+
+.learn-prose code {
+  background: var(--bg, #0f0f13);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.learn-prose pre {
+  background: var(--bg, #0f0f13);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+
+/* ─── 7. Content protection — overlay & CSS guards ──────── */
+
+/*
+ * WHAT THIS DOES (client-side layer):
+ *
+ * a) .media-shield — a transparent <div> absolutely positioned
+ *    OVER the video/image. It intercepts right-click (context menu)
+ *    and drag events. The video controls still work because they
+ *    are painted by the browser's native layer above our shield.
+ *    On mobile this blocks long-press "Save image / Download video".
+ *
+ * b) user-select: none on all media containers — prevents text
+ *    selection that could reveal URLs in copy-paste.
+ *
+ * c) -webkit-touch-callout: none — suppresses iOS long-press sheet.
+ *
+ * IMPORTANT: Client-side protection is a deterrent, not a lock.
+ * Real protection requires server-side auth on /uploads/ routes.
+ * See: server/middleware/auth_uploads.py (or equivalent).
+ * The API must require a valid session cookie / Bearer token before
+ * serving any file under /uploads/.  Without that, anyone can
+ * craft a direct request with curl and bypass all of this.
+ */
+
+.media-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  /* Fully transparent — user sees content normally */
+  background: transparent;
+  /* Block right-click and drag on the overlay */
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* Video native controls sit above z-index 10 in Chrome/FF,
+   so .media-shield doesn't block them.  If a browser differs,
+   reduce z-index to 1 and test. */
+
+.learn-video-wrap,
+.learn-image-wrap {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Disable "Save Image As" long-press on mobile for image elements */
+.learn-image-wrap img {
+  pointer-events: none;
+}
+
+/* Media loading skeleton */
+.media-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--card-bg, #1a1a24);
+  border-radius: 0.75rem;
+  margin-bottom: 1.25rem;
+  color: var(--text-muted, #666);
+  font-size: 0.875rem;
+  gap: 0.5rem;
+  border: 1px solid var(--border, #2a2a3a);
+}
+
+
+/* ─── 8. AI chat panel ──────────────────────────────────── */
+
+.learn-ai-panel {
+  grid-area: ai;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-left: 1px solid var(--border, #2a2a3a);
+  background: var(--card-bg, #1a1a24);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.learn-root.ai-open .learn-ai-panel {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ai-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border, #2a2a3a);
+  flex-shrink: 0;
+}
+
+.ai-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text, #eee);
+}
+
+.ai-panel-title i { color: var(--primary, #7c6af7); }
+
+.ai-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border, #2a2a3a) transparent;
+}
+
+.ai-messages::-webkit-scrollbar { width: 4px; }
+.ai-messages::-webkit-scrollbar-thumb {
+  background: var(--border, #2a2a3a);
+  border-radius: 4px;
+}
+
+.ai-msg {
+  max-width: 88%;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.75rem;
+  font-size: 0.83rem;
+  line-height: 1.55;
+}
+
+.ai-msg.user {
+  background: var(--primary, #7c6af7);
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 0.2rem;
+}
+
+.ai-msg.assistant {
+  background: var(--bg, #0f0f13);
+  color: var(--text, #ddd);
+  align-self: flex-start;
+  border-bottom-left-radius: 0.2rem;
+  border: 1px solid var(--border, #2a2a3a);
+}
+
+.ai-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted, #666);
+  font-size: 0.8rem;
+}
+
+.ai-empty i { font-size: 1.5rem; opacity: 0.5; }
+
+.ai-input-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border, #2a2a3a);
+  flex-shrink: 0;
+}
+
+
+/* ─── 9. Drawers & overlay (mobile) ─────────────────────── */
+
+.learn-drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 299;
+  opacity: 0;
+  pointer-events: none; /* ← must never eat taps when invisible */
+  transition: opacity 0.25s ease;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.learn-drawer-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.learn-drawer-header {
+  display: none; /* shown on mobile via media query */
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--border, #2a2a3a);
+  flex-shrink: 0;
+}
+
+.learn-drawer-header-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text, #eee);
+}
+
+.learn-drawer-close {
+  background: none;
+  border: none;
+  padding: 0.3rem;
+  cursor: pointer;
+  color: var(--text-muted, #888);
+  font-size: 1rem;
+  border-radius: 4px;
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.learn-drawer-close:hover { color: var(--text, #eee); }
+
+
+/* ─── 10. Responsive breakpoints ────────────────────────── */
+
+/* ── ≤ 1024px: AI panel detaches into a drawer ── */
+@media (max-width: 1024px) {
+  .learn-root,
+  .learn-root.ai-open {
+    grid-template-columns: 260px 1fr;
+    grid-template-areas: "sidebar main";
+  }
+
+  .learn-ai-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(340px, 92vw);
+    z-index: 300;
+    border-left: 1px solid var(--border, #2a2a3a);
+    opacity: 1;
+    pointer-events: none;
+    transform: translateX(110%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.28s ease;
+  }
+
+  .learn-root.ai-open .learn-ai-panel {
+    pointer-events: auto;
+    transform: translateX(0);
+    box-shadow: -6px 0 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .learn-drawer-overlay { display: block; }
+}
+
+/* ── ≤ 768px: sidebar also becomes a drawer ── */
+@media (max-width: 768px) {
+  .learn-root,
+  .learn-root.ai-open {
+    grid-template-columns: 1fr;
+    grid-template-rows: 52px 1fr;
+    grid-template-areas:
+      "topbar"
+      "main";
+  }
+
+  .learn-topbar { display: flex; grid-area: topbar; }
+
+  .learn-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: min(360px, 92vw);
+    z-index: 300;
+    border-left: 1px solid var(--border, #2a2a3a);
+    border-right: none;
+    transform: translateX(110%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.28s ease;
+    box-shadow: none;
+  }
+
+  .learn-sidebar.open {
+    transform: translateX(0);
+    box-shadow: -6px 0 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .learn-drawer-header { display: flex; }
+
+  .learn-sidebar-info { display: none; }
+
+  /* Larger touch targets */
+  .topic-row   { padding: 0.15rem 0.4rem 0.1rem 0; }
+  .topic-label { font-size: 0.875rem; padding-bottom: 1.1rem; }
+  .topic-dot   { width: 12px; height: 12px; }
+
+  .learn-pdf-viewer   { height: 380px; }
+  .learn-content-inner { padding: 1rem 1rem 3rem; }
+
+  .learn-topic-header  { flex-direction: column; gap: 0.75rem; }
+  .learn-topic-actions { align-self: flex-end; }
+}
+
+/* ── ≤ 480px ── */
+@media (max-width: 480px) {
+  .learn-topbar-title { display: none; }
+  .learn-pdf-viewer   { height: 280px; }
+}
+
+
+/* ADDENDUM */
+/* ═══════════════════════════════════════════════════════════
+   LearnPage.css — ADDENDUM
+   Append to bottom of existing LearnPage.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Full-width media overrides ────────────────────────── */
+.learn-video-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  background: #000;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  aspect-ratio: 16 / 9;
+}
+.learn-video-wrap video { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+.learn-pdf-wrap  { width: 100%; margin-bottom: 1.25rem; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--border, #2a2a3a); }
+.learn-pdf-viewer { width: 100%; height: clamp(400px, 70vh, 760px); border: none; display: block; }
+
+.learn-image-wrap { width: 100%; text-align: center; margin-bottom: 1.25rem; position: relative; }
+.learn-image-wrap img { width: 100%; max-height: 560px; object-fit: contain; border-radius: 0.65rem; user-select: none; -webkit-user-select: none; pointer-events: none; }
+
+/* ─── Video seek overlay buttons ─────────────────────────── */
+.video-seek-controls {
+  position: absolute;
+  bottom: 54px; /* above native controls bar */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2.5rem;
+  z-index: 20;
+  pointer-events: none; /* let media-shield pass clicks; buttons override */
+}
+.video-seek-btn {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(0,0,0,0.55);
+  border: none;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s;
+  line-height: 1;
+}
+.video-seek-btn i { font-size: 0.9rem; }
+.video-seek-btn:hover { background: rgba(0,0,0,0.8); }
+
+/* Hide seek buttons on mobile — controls tight */
+@media (max-width: 600px) { .video-seek-controls { display: none; } }
+
+/* ─── "Curating content" empty state ─────────────────────── */
+.learn-curating-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  background: linear-gradient(135deg, var(--card-bg, #1a1a24) 0%, var(--bg, #0f0f13) 100%);
+  border-radius: 1rem;
+  border: 1px dashed var(--border, #2a2a3a);
+  margin-bottom: 1.5rem;
+}
+.curating-icon {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-subtle, #3b2f8a) 0%, var(--primary, #7c6af7) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; color: #fff;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 0 30px rgba(124,106,247,0.3);
+}
+.learn-curating-state h5 { font-weight: 700; color: var(--text, #eee); margin-bottom: 0.5rem; }
+.learn-curating-state p  { color: var(--text-muted, #888); font-size: 0.875rem; max-width: 380px; margin: 0; }
+
+/* ─── Inline Quiz card ───────────────────────────────────── */
+.learn-quiz-card {
+  border: 1px solid var(--primary, #7c6af7);
+  border-radius: 1rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  background: var(--card-bg, #1a1a24);
+  
+}
+
+.learn-quiz-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  background: linear-gradient(90deg, rgba(124,106,247,0.15), transparent);
+  border-bottom: 1px solid var(--border, #2a2a3a);
+  flex-wrap: wrap;
+}
+.learn-quiz-intro {
+  padding: 1.25rem 1.1rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+}
+.quiz-intro-stats {
+  display: flex; gap: 1.2rem; flex-wrap: wrap;
+  font-size: 0.8rem; color: var(--text-muted, #888);
+}
+.quiz-intro-stats span { display: flex; align-items: center; gap: 0.3rem; }
+
+/* Body */
+.learn-quiz-body { padding: 1.1rem; }
+.quiz-progress-bar {
+  width: 100%; height: 4px;
+  background: var(--border, #2a2a3a);
+  border-radius: 999px; overflow: hidden; margin-bottom: 0.75rem;
+}
+.quiz-progress-fill { height: 100%; background: var(--primary, #7c6af7); border-radius: 999px; transition: width 0.3s; }
+.quiz-q-counter { font-size: 0.72rem; color: var(--text-muted, #888); margin-bottom: 0.5rem; }
+.quiz-question-body { font-size: 0.9rem; font-weight: 600; color: var(--text, #eee); line-height: 1.55; margin-bottom: 1rem; }
+
+/* MCQ options */
+.quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+.quiz-option-btn {
+  display: flex; align-items: center; gap: 0.75rem;
+  width: 100%; text-align: left;
+  background: var(--bg, #0f0f13);
+  border: 1.5px solid var(--border, #2a2a3a);
+  border-radius: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem; color: var(--text, #ddd);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.quiz-option-btn:hover { border-color: var(--primary, #7c6af7); background: rgba(124,106,247,0.07); }
+.quiz-option-btn.selected { border-color: var(--primary, #7c6af7); background: rgba(124,106,247,0.15); color: #fff; }
+.option-letter {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--border, #2a2a3a); display: flex; align-items: center; justify-content: center;
+  font-size: 0.68rem; font-weight: 700; flex-shrink: 0;
+}
+.quiz-option-btn.selected .option-letter { background: var(--primary, #7c6af7); color: #fff; }
+
+/* Nav */
+.quiz-nav { display: flex; justify-content: space-between; }
+
+/* Result */
+.learn-quiz-result { padding: 1.5rem 1.1rem; text-align: center; }
+.quiz-result-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.75rem; margin: 0 auto 0.75rem;
+}
+.quiz-result-icon.passed  { background: rgba(34,197,94,0.15); color: #22c55e; }
+.quiz-result-icon.failed  { background: rgba(239,68,68,0.12); color: #ef4444; }
+.quiz-result-score { font-size: 2rem; font-weight: 800; color: var(--text, #eee); }
+.quiz-result-msg   { font-size: 0.85rem; color: var(--text-muted, #aaa); margin-top: 0.25rem; }
+
+/* Answer review */
+.quiz-answers-review { text-align: left; }
+.quiz-answer-row {
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+}
+.quiz-answer-row.correct { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); }
+.quiz-answer-row.wrong   { background: rgba(239,68,68,0.07);  border: 1px solid rgba(239,68,68,0.2); }
+
+/* ─── Project section ────────────────────────────────────── */
+.learn-project-section {
+  border-top: 2px solid var(--border, #2a2a3a);
+  padding-top: 1.5rem; margin-top: 1rem;
+}
+.learn-project-header {
+  font-size: 0.95rem; font-weight: 700; color: var(--text, #eee);
+  display: flex; align-items: center;
+  margin-bottom: 1rem;
+}
+.learn-project-card {
+  background: var(--card-bg, #1a1a24);
+  border: 1px solid var(--border, #2a2a3a);
+  border-radius: 0.85rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.learn-project-title { font-size: 0.95rem; font-weight: 700; color: var(--text, #eee); margin-bottom: 0.4rem; }
+.learn-project-desc  { font-size: 0.83rem; color: var(--text-muted, #aaa); margin-bottom: 0.75rem; line-height: 1.6; }
+
+.project-submission-status { }
+.project-status-badge {
+  display: inline-flex; align-items: center;
+  font-size: 0.78rem; font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+}
+.project-status-badge.pending   { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.project-status-badge.reviewing { background: rgba(96,165,250,0.15);  color: #60a5fa; }
+.project-status-badge.returned  { background: rgba(34,197,94,0.15);   color: #22c55e; }
+
+.project-feedback {
+  background: var(--bg, #0f0f13);
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--primary, #7c6af7);
+}
+.project-submit-form { 
+
+}
+
+/* ─── Responsive: quiz & project on mobile ───────────────── */
+@media (max-width: 768px) {
+  .learn-quiz-header { padding: 0.7rem 0.9rem; font-size: 0.85rem; }
+  .learn-quiz-body   { padding: 0.85rem; }
+  .learn-project-card { padding: 1rem; }
+  .quiz-question-body { font-size: 0.85rem; }
+  .video-seek-controls { bottom: 48px; gap: 1.5rem; }
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Quiz card patch */
+
+.learn-quiz-panel { /* alias — same as learn-quiz-card */
+  border: 1px solid var(--primary, #7c6af7);
+  border-radius: 1rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  background: var(--card-bg, #1a1a24);
+}
+
+.learn-quiz-panel .learn-quiz-header {
+  display: flex; align-items: center; gap:.5rem;
+  padding: .85rem 1.1rem;
+  background: linear-gradient(90deg,rgba(124,106,247,.15),transparent);
+  border-bottom: 1px solid var(--border,#2a2a3a);
+  font-size:.88rem; font-weight:700; color:var(--text,#eee);
+}
+.learn-quiz-panel .learn-quiz-intro  { padding:1.25rem 1.1rem; }
+.learn-quiz-panel .learn-quiz-body   { padding:1.1rem; }
+.learn-quiz-panel .learn-quiz-result { padding:1.25rem 1.1rem; }
+.learn-quiz-question { margin-bottom:1.25rem; }
+.learn-quiz-q-header {
+  display:flex; align-items:flex-start; gap:.6rem; margin-bottom:.6rem;
+}
+.learn-quiz-q-num {
+  min-width:22px; height:22px; border-radius:50%;
+  background:var(--primary,#7c6af7); color:#fff;
+  font-size:.7rem; font-weight:700; display:flex;
+  align-items:center; justify-content:center; flex-shrink:0; margin-top:2px;
+}
+.learn-quiz-q-text { flex:1; font-size:.88rem; font-weight:600; color:var(--text,#eee); }
+.learn-quiz-q-pts  { font-size:.72rem; color:var(--text-muted,#888); flex-shrink:0; }
+.learn-quiz-option {
+  display:flex; align-items:center; gap:.65rem;
+  padding:.55rem .8rem; margin-bottom:.4rem;
+  border-radius:.5rem; border:1.5px solid var(--border,#2a2a3a);
+  background:var(--bg,#0f0f13); font-size:.84rem;
+  color:var(--text,#ddd); cursor:pointer; transition:border-color .15s;
+}
+.learn-quiz-option:hover  { border-color:var(--primary,#7c6af7); }
+.learn-quiz-option.selected {
+  border-color:var(--primary,#7c6af7);
+  background:rgba(124,106,247,.15); color:#fff;
+}
+.learn-quiz-option input { flex-shrink:0; }
+.learn-quiz-result-badge {
+  display:flex; align-items:center; justify-content:center;
+  gap:.5rem; padding:.65rem 1rem; border-radius:.65rem;
+  font-size:.95rem; font-weight:700; margin-bottom:1rem;
+}
+.learn-quiz-result-badge.passed { background:rgba(34,197,94,.12); color:#22c55e; }
+.learn-quiz-result-badge.failed { background:rgba(239,68,68,.1); color:#ef4444; }
+.learn-quiz-feedback {
+  background:var(--bg,#0f0f13); border-radius:.5rem;
+  border-left:3px solid var(--primary,#7c6af7);
+  padding:.75rem .9rem; margin-bottom:.75rem; font-size:.83rem;
+}
+
+.learn-quiz-breakdown { margin-top:.75rem; }
+.learn-quiz-breakdown-item {
+  padding:.65rem .75rem; border-radius:.5rem;
+  margin-bottom:.4rem; font-size:.82rem;
+}
+.learn-quiz-breakdown-item.correct {
+  background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.25);
+}
+.learn-quiz-breakdown-item.wrong {
+  background:rgba(239,68,68,.07); border:1px solid rgba(239,68,68,.2);
+}
+.learn-quiz-breakdown-item.pending {
+  background:rgba(251,191,36,.07); border:1px solid rgba(251,191,36,.2);
+}
+
+/* 
+
+*/
+.learn-no-quiz-notice {
+  display:flex; align-items:center; gap:.6rem;
+  padding:.75rem 1rem; border-radius:.65rem; margin-bottom:1rem;
+  border:1px dashed var(--border,#2a2a3a);
+  color:var(--text-muted,#888); font-size:.82rem;
+}
+.learn-no-quiz-notice i { font-size:1rem; opacity:.6; }
+
+
+/* Quiz Multi-Step Styles */
+/* ═══════════════════════════════════════════════════════════
+   ADD to LearnPage.css — quiz multistep styles
+   ═══════════════════════════════════════════════════════════ */
+/*
+.learn-quiz-step-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+.learn-quiz-step-dots {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+.quiz-step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--border, #cbd5e1);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, transform 0.15s;
+}
+.quiz-step-dot:hover      { transform: scale(1.25); }
+.quiz-step-dot.answered   { background: var(--primary-light, #c7d2fe); border-color: var(--primary, #5826ee); }
+.quiz-step-dot.active     { background: var(--primary, #5826ee); border-color: var(--primary, #5826ee); transform: scale(1.35); }
+.learn-quiz-step-counter  { font-size: .78rem; color: var(--text-muted); white-space: nowrap; }
+ 
+.learn-quiz-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border, #e5e7eb);
+}
+*/
+/* v2 */
+/* ═══════════════════════════════════════════════════════════
+   LearnPage.css — Quiz multistep additions
+   Append these to your existing LearnPage.css.
+   All class names match the rewritten InlineQuizPlayer.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Step progress strip ────────────────────────────────── */
+.learn-quiz-step-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.learn-quiz-step-dots {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.quiz-step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--border, #cbd5e1);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, transform 0.15s;
+  flex-shrink: 0;
+}
+.quiz-step-dot:hover {
+  transform: scale(1.3);
+  border-color: var(--primary, #5826ee);
+}
+.quiz-step-dot.answered {
+  background: color-mix(in srgb, var(--primary, #5826ee) 20%, transparent);
+  border-color: var(--primary, #5826ee);
+}
+.quiz-step-dot.active {
+  background: var(--primary, #5826ee);
+  border-color: var(--primary, #5826ee);
+  transform: scale(1.4);
+  box-shadow: 0 0 0 3px rgba(88, 38, 238, 0.18);
+}
+
+.learn-quiz-step-counter {
+  font-size: 0.78rem;
+  color: var(--text-muted, #6b7280);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ── Question slide-in animation ────────────────────────── */
+.learn-quiz-question {
+  animation: quizQSlide 0.2s ease;
+}
+@keyframes quizQSlide {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Navigation row (Prev / Next / Submit) ──────────────── */
+.learn-quiz-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border, #e5e7eb);
+}
+
+/* ── "No quiz" creator notice ───────────────────────────── */
+.learn-no-quiz-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, #ef4444 8%, transparent);
+  border: 1px dashed #ef4444;
+  font-size: 0.82rem;
+  margin-top: 1rem;
+}
+.learn-no-quiz-notice i { font-size: 1rem; flex-shrink: 0; }
+
+/* ── Quiz panel wrapper ─────────────────────────────────── */
+.learn-quiz-panel {
+  margin-top: 1.5rem;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.learn-quiz-header {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--bg, #f6f7fb);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  font-weight: 600;
+  font-size: 0.9rem;
+  gap: 0.25rem;
+}
+
+/* ── Intro / body / result sections ─────────────────────── */
+.learn-quiz-intro,
+.learn-quiz-body,
+.learn-quiz-result {
+  padding: 1rem 1.125rem;
+}
+
+/* ── Single question card ───────────────────────────────── */
+.learn-quiz-q-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin-bottom: 0.875rem;
+}
+.learn-quiz-q-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary, #5826ee);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.learn-quiz-q-text {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.learn-quiz-q-pts {
+  font-size: 0.7rem;
+  color: var(--text-muted, #6b7280);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+/* ── Option buttons ─────────────────────────────────────── */
+.learn-quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.375rem;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.learn-quiz-option:hover {
+  border-color: var(--primary, #5826ee);
+  background: color-mix(in srgb, var(--primary, #5826ee) 5%, transparent);
+}
+.learn-quiz-option.selected {
+  border-color: var(--primary, #5826ee);
+  background: color-mix(in srgb, var(--primary, #5826ee) 10%, transparent);
+  font-weight: 500;
+}
+.learn-quiz-option input[type="radio"],
+.learn-quiz-option input[type="checkbox"] {
+  accent-color: var(--primary, #5826ee);
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* ── Result badge ───────────────────────────────────────── */
+.learn-quiz-result-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+.learn-quiz-result-badge.passed {
+  background: color-mix(in srgb, #22c55e 12%, transparent);
+  color: #15803d;
+}
+.learn-quiz-result-badge.failed {
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+  color: #b91c1c;
+}
+
+/* ── AI / tutor feedback blocks ─────────────────────────── */
+.learn-quiz-feedback {
+  margin-bottom: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+  background: var(--bg, #f6f7fb);
+  border-left: 3px solid var(--primary, #5826ee);
+  font-size: 0.85rem;
+}
+
+/* ── Per-question breakdown ─────────────────────────────── */
+.learn-quiz-breakdown {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.learn-quiz-breakdown-item {
+  padding: 0.625rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border, #e5e7eb);
+  font-size: 0.83rem;
+}
+.learn-quiz-breakdown-item.correct {
+  border-color: #86efac;
+  background: color-mix(in srgb, #22c55e 7%, transparent);
+}
+.learn-quiz-breakdown-item.wrong {
+  border-color: #fca5a5;
+  background: color-mix(in srgb, #ef4444 7%, transparent);
+}
+.learn-quiz-breakdown-item.pending {
+  border-color: #fcd34d;
+  background: color-mix(in srgb, #f59e0b 7%, transparent);
+}
+
+/* ── Project submission panel ───────────────────────────── */
+.learn-project-panel {
+  margin-top: 1.5rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  background: var(--surface, #f8fafc);
+}
+.learn-project-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin-bottom: 0.5rem;
+}
+.learn-project-header i { margin-top: 2px; }
+
+/* Course Editor Pill Steps */
+.step-pills-scroll {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: none;          /* Firefox */
+  -webkit-overflow-scrolling: touch;
+}
+.step-pills-scroll::-webkit-scrollbar { display: none; }
+ 
+.step-pill {
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.85rem;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+.step-pill-num {
+  font-weight: 700;
+  font-size: 0.7rem;
+  opacity: 0.65;
+}
+.btn-primary  .step-pill-num,
+.btn-success  .step-pill-num { opacity: 0.8; }

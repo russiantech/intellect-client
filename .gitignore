@@ -1,0 +1,79 @@
+# =========================
+# REACT / VITE / NEXT CLIENT
+# =========================
+
+# Dependencies
+node_modules/
+
+# Build folders
+dist/
+build/
+.next/
+out/
+coverage/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# TypeScript
+*.tsbuildinfo
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
+
+# Testing
+coverage/
+
+# Temporary files
+tmp/
+temp/
+
+# Ignore files ending with underscore + numbers
+*_[0-9].*
+*_[0-9][0-9]*.*
+
+# Ignore underscore-prefixed directories everywhere
+_*/
+**/_*/
+
+# Examples:
+# _backup/
+# src/_old/
+# components/_drafts/
+
+# Ignore common generated folders
+storybook-static/
+
+# Package manager files (optional)
+.pnp
+.pnp.js
+
+# Misc
+*.local
+
+# Optional lock files
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml

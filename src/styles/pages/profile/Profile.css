@@ -1,0 +1,336 @@
+/* pages/profile/Profile.css */
+
+.pf-loading  { display: flex; justify-content: center; padding: 5rem 0; }
+.pf-notfound { text-align: center; padding: 5rem 1rem; }
+.pf-notfound-icon { font-size: 3rem; color: #d1d5db; display: block; margin-bottom: 1rem; }
+
+/* ── Hero ─────────────────────────────────────────────── */
+.pf-hero {
+  background: linear-gradient(135deg, var(--primary) 0%, #7c4dff 100%);
+  padding: 2.5rem 1.5rem 2rem;
+  position: relative;
+}
+
+.pf-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 36px;
+  background: var(--bg, #f6f7fb);
+  clip-path: ellipse(55% 100% at 50% 100%);
+}
+
+.pf-hero-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+/* Avatar */
+.pf-avatar-wrap { position: relative; flex-shrink: 0; }
+
+.pf-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255,255,255,0.3);
+}
+
+.pf-online-dot {
+  position: absolute;
+  bottom: 4px; right: 4px;
+  width: 16px; height: 16px;
+  background: #22c55e;
+  border: 3px solid #6d28d9;
+  border-radius: 50%;
+}
+
+.pf-avatar-edit-btn {
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 30px; height: 30px;
+  background: var(--accent, #f38207);
+  color: #fff;
+  border: 2.5px solid #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.pf-avatar-edit-btn:hover { background: #dc7005; }
+
+/* Hero info */
+.pf-hero-info { flex: 1; min-width: 0; }
+
+.pf-role-pills {
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+
+.pf-role-pill {
+  font-size: 0.68rem; font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: 50px;
+  display: inline-flex; align-items: center;
+}
+.pf-role-pill--student    { background: rgba(255,255,255,.15); color: rgba(255,255,255,.9); }
+.pf-role-pill--tutor      { background: rgba(255,255,255,.2);  color: #fff; }
+.pf-role-pill--creator    { background: rgba(243,130,7,.25);   color: #fde68a; }
+.pf-role-pill--instructor { background: rgba(255,255,255,.18); color: #fff; }
+.pf-role-pill--admin      { background: rgba(239,68,68,.25);   color: #fca5a5; }
+.pf-role-pill--verified   { background: rgba(34,197,94,.2);    color: #bbf7d0; }
+
+.pf-name {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  font-weight: 800; color: #fff;
+  margin-bottom: 0.15rem; line-height: 1.2;
+}
+
+.pf-username { font-size: 0.82rem; color: rgba(255,255,255,.6); margin-bottom: 0.3rem; }
+
+.pf-title { font-size: 0.95rem; color: rgba(255,255,255,.82); margin-bottom: 0.65rem; font-weight: 500; }
+
+.pf-meta-row {
+  display: flex; flex-wrap: wrap; gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.pf-meta-item {
+  display: flex; align-items: center; gap: 0.3rem;
+  font-size: 0.78rem; color: rgba(255,255,255,.7);
+}
+
+/* Socials */
+.pf-socials { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+.pf-social-link {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,.14);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.85); font-size: 0.95rem;
+  text-decoration: none;
+  transition: background .15s, color .15s;
+}
+.pf-social-link:hover { background: rgba(255,255,255,.26); color: #fff; }
+
+/* Actions */
+.pf-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* ── Body ─────────────────────────────────────────────── */
+.pf-body {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+.pf-layout {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+/* ── Sections ── */
+.pf-section { margin-bottom: 2.25rem; }
+
+.pf-section-title {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.98rem; font-weight: 700; color: #1a1a2e;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+.pf-section-title i { color: var(--primary); }
+
+.pf-section-private {
+  margin-left: auto;
+  font-size: 0.68rem; font-weight: 500;
+  color: #9ca3af; background: #f3f4f6;
+  padding: 0.2rem 0.55rem; border-radius: 4px;
+}
+
+.pf-about {
+  font-size: 0.9rem; color: #4b5563;
+  line-height: 1.85; white-space: pre-wrap;
+}
+
+/* Expertise */
+.pf-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.pf-tag {
+  font-size: 0.75rem; font-weight: 600;
+  background: #ede9fe; color: var(--primary);
+  padding: 0.3rem 0.7rem; border-radius: 6px;
+}
+
+/* Projects grid */
+.pf-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.pf-project-card {
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+.pf-project-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(88,38,238,.1);
+  border-color: #c4b5fd;
+}
+
+.pf-project-img img { width: 100%; height: 150px; object-fit: cover; }
+
+.pf-project-placeholder {
+  height: 110px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.pf-project-body { padding: 0.9rem; }
+
+.pf-project-type-row {
+  display: flex; align-items: center; gap: 0.35rem;
+  font-size: 0.7rem; font-weight: 600;
+  color: #9ca3af; text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 0.35rem;
+}
+.pf-project-year { margin-left: auto; font-size: 0.68rem; }
+
+.pf-project-title {
+  font-size: 0.88rem; font-weight: 700; color: #1a1a2e;
+  margin-bottom: 0.35rem;
+}
+
+.pf-project-desc {
+  font-size: 0.76rem; color: #6b7280; line-height: 1.6;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.pf-project-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-bottom: 0.55rem; }
+.pf-ptag {
+  font-size: 0.65rem; background: #f3f4f6; color: #374151;
+  padding: 0.15rem 0.4rem; border-radius: 3px;
+}
+
+.pf-project-link {
+  font-size: 0.76rem; font-weight: 600;
+  color: var(--primary); text-decoration: none;
+  display: inline-flex; align-items: center;
+}
+.pf-project-link:hover { text-decoration: underline; }
+
+/* Education timeline */
+.pf-edu-timeline { display: flex; flex-direction: column; }
+
+.pf-edu-item { display: flex; gap: 0.85rem; }
+
+.pf-edu-marker {
+  display: flex; flex-direction: column; align-items: center;
+  flex-shrink: 0; padding-top: 0.15rem;
+}
+
+.pf-edu-dot {
+  width: 10px; height: 10px;
+  background: var(--primary); border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pf-edu-line {
+  width: 2px; flex: 1; background: #e5e7eb;
+  margin: 4px 0; min-height: 24px;
+}
+
+.pf-edu-content {
+  display: flex; flex-direction: column; gap: 0.1rem;
+  padding-bottom: 1.25rem;
+}
+.pf-edu-degree   { font-size: 0.88rem; font-weight: 700; color: #1a1a2e; }
+.pf-edu-institution { font-size: 0.8rem; color: #6b7280; }
+.pf-edu-year     { font-size: 0.72rem; color: #9ca3af; }
+
+/* Details grid */
+.pf-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.pf-detail-item {
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  background: #f6f7fb; border-radius: 10px; padding: 0.75rem;
+}
+
+.pf-detail-icon { color: var(--primary); font-size: 0.9rem; margin-top: 0.1rem; flex-shrink: 0; }
+.pf-detail-label { font-size: 0.68rem; color: #9ca3af; text-transform: uppercase; letter-spacing: .5px; }
+.pf-detail-value { font-size: 0.85rem; color: #1a1a2e; font-weight: 500; }
+
+/* ── Sidebar ── */
+.pf-sidebar { display: flex; flex-direction: column; gap: 1.1rem; }
+
+.pf-sidebar-card {
+  background: #fff;
+  border: 1.5px solid #ede9fe;
+  border-radius: 14px;
+  padding: 1.15rem;
+}
+
+.pf-sidebar-title {
+  display: flex; align-items: center; gap: 0.45rem;
+  font-size: 0.82rem; font-weight: 700; color: #1a1a2e;
+  margin-bottom: 0.9rem;
+}
+.pf-sidebar-title i { color: var(--primary); }
+
+.pf-expertise-wrap { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.pf-expertise-tag {
+  background: #ede9fe; color: var(--primary);
+  font-size: 0.72rem; font-weight: 600;
+  padding: 0.25rem 0.6rem; border-radius: 5px;
+}
+
+/* Stats */
+.pf-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(55px, 1fr));
+  gap: 0.6rem; text-align: center;
+}
+
+.pf-stat-value {
+  display: block; font-size: 1.3rem; font-weight: 800;
+  color: var(--primary); line-height: 1;
+}
+.pf-stat-label { font-size: 0.67rem; color: #9ca3af; display: block; margin-top: 0.15rem; }
+
+/* Edit nudge */
+.pf-edit-nudge { text-align: center; }
+.pf-nudge-icon { font-size: 1.6rem; color: var(--primary); display: block; margin-bottom: 0.5rem; }
+.pf-nudge-text { font-size: 0.78rem; color: #6b7280; line-height: 1.55; margin-bottom: 0.9rem; }
+
+/* CTA */
+.pf-cta-card { background: linear-gradient(135deg, #faf5ff, #ede9fe); border-color: #c4b5fd; text-align: center; }
+.pf-cta-icon { font-size: 1.75rem; color: var(--primary); display: block; margin-bottom: 0.5rem; }
+.pf-cta-text { font-size: 0.8rem; color: #4b5563; margin-bottom: 0.9rem; line-height: 1.5; }
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .pf-layout { grid-template-columns: 1fr; }
+  .pf-sidebar { order: -1; }
+  .pf-hero-inner { flex-direction: column; align-items: center; text-align: center; }
+  .pf-meta-row { justify-content: center; }
+  .pf-socials { justify-content: center; }
+  .pf-actions { justify-content: center; }
+  .pf-role-pills { justify-content: center; }
+  .pf-hero::after { display: none; }
+  .pf-projects-grid { grid-template-columns: 1fr; }
+  .pf-avatar { width: 90px; height: 90px; }
+}

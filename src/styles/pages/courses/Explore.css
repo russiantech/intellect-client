@@ -1,0 +1,621 @@
+/* ═══════════════════════════════════════════════════════════
+   Explore.css
+   All styles scoped to the Explore page.
+   ═══════════════════════════════════════════════════════════ */
+
+
+/* ─── Page root ─────────────────────────────────────────── */
+.explore-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+
+/* ─── Page header ───────────────────────────────────────── */
+.explore-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.explore-page-header h1 {
+  margin-bottom: 0.2rem;
+}
+
+.explore-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted, #6b7280);
+  margin: 0;
+}
+
+.explore-subtitle__filtered {
+  color: var(--primary, #4f46e5);
+  font-weight: 700;
+}
+
+
+/* ─── Two-column layout ─────────────────────────────────── */
+.explore-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  align-items: start;
+  gap: 1.75rem;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Filter Sidebar — desktop: sticky panel
+   ═══════════════════════════════════════════════════════════ */
+.filter-sidebar {
+  position: sticky;
+  top: 1.25rem;
+  max-height: calc(100vh - 2.5rem);
+  overflow-y: auto;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--card-bg, #fff);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border, #e5e7eb) transparent;
+}
+
+.filter-sidebar::-webkit-scrollbar { width: 4px; }
+.filter-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border, #e5e7eb);
+  border-radius: 4px;
+}
+
+
+/* ─── Sidebar header ────────────────────────────────────── */
+.filter-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.1rem 0.85rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  position: sticky;
+  top: 0;
+  background: var(--card-bg, #fff);
+  z-index: 1;
+}
+
+.filter-sidebar-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--text, #111);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.filter-sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.filter-clear-btn {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  white-space: nowrap;
+}
+
+.filter-sidebar-close {
+  display: none; /* shown only on mobile via media query */
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0.3rem;
+  cursor: pointer;
+  color: var(--text-muted, #6b7280);
+  font-size: 1rem;
+  line-height: 1;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.filter-sidebar-close:hover { color: var(--text, #111); }
+
+
+/* ─── Individual filter section ─────────────────────────── */
+.filter-section {
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+}
+
+.filter-section:last-child { border-bottom: none; }
+
+.filter-section-title {
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted, #6b7280);
+  margin-bottom: 0.65rem;
+}
+
+
+/* ─── Checkbox list ─────────────────────────────────────── */
+.filter-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.filter-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.42rem 0.5rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.filter-checkbox-item:hover {
+  background: var(--hover-bg, #f3f4f6);
+}
+
+.filter-checkbox-item.checked {
+  background: color-mix(in srgb, var(--primary, #4f46e5) 8%, transparent);
+}
+
+/* Custom checkbox */
+.filter-checkbox-item input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--border-dark, #9ca3af);
+  border-radius: 4px;
+  background: var(--card-bg, #fff);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s, background 0.15s;
+  pointer-events: none;
+}
+
+.filter-checkbox-item input[type='checkbox']:checked {
+  background: var(--primary, #4f46e5);
+  border-color: var(--primary, #4f46e5);
+}
+
+.filter-checkbox-item input[type='checkbox']:checked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 10px no-repeat;
+}
+
+.filter-checkbox-item label {
+  font-size: 0.83rem;
+  color: var(--text, #111);
+  cursor: pointer;
+  line-height: 1.35;
+  flex: 1;
+  margin: 0;
+  text-transform: capitalize;
+  pointer-events: none;
+}
+
+.filter-checkbox-item.checked label {
+  color: var(--primary, #4f46e5);
+  font-weight: 600;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Mobile filter toggle button & overlay
+
+   FIX: The overlay must use pointer-events: none when hidden
+   so it never swallows clicks on the page content beneath it.
+   Only when .show is present should it intercept clicks.
+   ═══════════════════════════════════════════════════════════ */
+.filter-toggle-btn {
+  display: none; /* revealed by media query */
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-dark, #9ca3af);
+  background: var(--card-bg, #fff);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text, #111);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.filter-toggle-btn:hover {
+  border-color: var(--primary, #4f46e5);
+  color: var(--primary, #4f46e5);
+}
+
+.filter-active-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary, #4f46e5);
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+/* ── CRITICAL FIX: pointer-events: none when overlay is not active ── */
+.filter-overlay {
+  display: none; /* revealed by media query */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 199;
+  opacity: 0;
+  /* Invisible → must not capture any pointer events */
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* Only capture clicks when the drawer is actually open */
+.filter-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Course column, sort bar, chips, grid, pagination
+   ═══════════════════════════════════════════════════════════ */
+.explore-courses-col { min-width: 0; }
+
+.explore-sortbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.explore-sortbar-info {
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+  min-height: 1.2em;
+}
+
+.explore-sortbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+}
+
+/* Active filter chips */
+.explore-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+/* Course grid — 3 columns at full desktop width */
+.explore-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.1rem;
+}
+
+/* Pagination */
+.explore-pagination {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.explore-pagination .page-link {
+  min-width: 38px;
+  text-align: center;
+  border-radius: 6px !important;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.explore-pagination .page-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  color: var(--text-muted, #6b7280);
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Search Modal — command-palette style
+   ═══════════════════════════════════════════════════════════ */
+.search-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 500;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 10vh 1rem 0;
+  animation: smb-in 0.18s ease;
+}
+
+@keyframes smb-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.search-modal {
+  width: min(640px, 100%);
+  background: var(--card-bg, #1e1e2e);
+  border: 1px solid var(--border, #3a3a4e);
+  border-radius: 1rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  animation: sm-in 0.2s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@keyframes sm-in {
+  from { transform: translateY(-10px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1);        opacity: 1; }
+}
+
+/* Input row */
+.search-modal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1.1rem;
+  border-bottom: 1px solid var(--border, #3a3a4e);
+}
+
+.search-modal-input-icon {
+  font-size: 1rem;
+  color: var(--text-muted, #8888aa);
+  flex-shrink: 0;
+  /* Ensure Bootstrap Icons font renders inside modal stacking context */
+  font-family: 'bootstrap-icons', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.search-modal-spinner {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border: 2px solid var(--border, #3a3a4e);
+  border-top-color: var(--primary, #7c6af7);
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.search-modal-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1.05rem;
+  color: var(--text, #f0f0f8);
+  caret-color: var(--primary, #7c6af7);
+}
+
+.search-modal-input::placeholder {
+  color: var(--text-muted, #6b6b88);
+}
+
+.search-modal-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0.2rem 0.3rem;
+  cursor: pointer;
+  color: var(--text-muted, #8888aa);
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.search-modal-clear-btn:hover { color: var(--text, #f0f0f8); }
+
+/* Results list */
+.search-modal-results {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 0.4rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border, #3a3a4e) transparent;
+}
+
+.search-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.search-result-item:hover,
+.search-result-item.active {
+  background: color-mix(in srgb, var(--primary, #7c6af7) 12%, transparent);
+  border-left-color: var(--primary, #7c6af7);
+}
+
+.search-result-title {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text, #f0f0f8);
+  line-height: 1.4;
+}
+
+.search-result-slug {
+  font-size: 0.74rem;
+  color: var(--text-muted, #6b6b88);
+  font-family: 'Courier New', monospace;
+}
+
+/* Highlighted match characters */
+.search-highlight {
+  background: transparent;
+  color: var(--primary, #a78bfa);
+  font-weight: 700;
+  padding: 0;
+}
+
+/* No-results state */
+.search-modal-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.25rem 1rem;
+  color: var(--text-muted, #8888aa);
+  font-size: 0.875rem;
+  gap: 0.5rem;
+}
+
+/* Keyboard hint footer */
+.search-modal-footer {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.6rem 1.1rem;
+  border-top: 1px solid var(--border, #3a3a4e);
+  font-size: 0.72rem;
+  color: var(--text-muted, #8888aa);
+}
+
+.search-modal-footer span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.search-modal-footer kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--border, #3a3a4e);
+  border-radius: 3px;
+  background: var(--hover-bg, #2a2a3e);
+  /* Explicit color so it renders regardless of theme */
+  color: #c0c0d8;
+  font-family: inherit;
+  line-height: 1.4;
+  min-width: 20px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Responsive breakpoints
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Tablet / mobile ≤ 992px ── */
+@media (max-width: 992px) {
+  /* Collapse to single-column layout */
+  .explore-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Reveal mobile controls */
+  .filter-toggle-btn { display: flex; }
+
+  /*
+    FIX: On mobile, the overlay must be block but still
+    pointer-events: none until .show — handled above globally.
+  */
+  .filter-overlay { display: block; }
+
+  /* Reveal close button inside drawer */
+  .filter-sidebar-close { display: flex; }
+
+  /* Convert sidebar to right-side slide-in drawer */
+  .filter-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: auto;
+    bottom: 0;
+    width: min(340px, 88vw);
+    max-height: 100dvh;
+    border-radius: 1rem 0 0 1rem;
+    border-right: none;
+    /* Ensure drawer sits above overlay */
+    z-index: 200;
+    transform: translateX(110%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.28s ease;
+    box-shadow: none;
+    /* Drawer must always capture its own clicks */
+    pointer-events: auto;
+  }
+
+  .filter-sidebar.open {
+    transform: translateX(0);
+    box-shadow: -4px 0 40px rgba(0, 0, 0, 0.22);
+  }
+
+  /* Larger touch targets inside drawer */
+  .filter-checkbox-item {
+    padding: 0.65rem 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .filter-checkbox-item input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .filter-checkbox-item label {
+    font-size: 0.9rem;
+  }
+
+  /* 2-column grid on tablet */
+  .explore-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Small mobile ≤ 576px ── */
+@media (max-width: 576px) {
+  .explore-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-sortbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-modal-footer {
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+}

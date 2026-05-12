@@ -1,0 +1,22 @@
+
+/* LessonAssessment Section */
+.lesson-assessment-section {
+  border-top: 1px dashed var(--border, #e2e8f0);
+  padding-top: 0.875rem;
+  margin-top: 0.875rem;
+
+  /*  */
+      border: 1px dashed var(--border, #2a2a3a);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+}
+ 
+.assessment-builder-panel {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border, #e2e8f0);
+  border-left: 3px solid #f59e0b;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  animation: slideDown 0.18s ease;
+}
