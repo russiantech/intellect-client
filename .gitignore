@@ -59,7 +59,8 @@ _*/
 **/_*/
 
 # Examples:
-# _backup/
+*.zip
+_backup/
 # src/_old/
 # components/_drafts/
 
