@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { enrollmentsApi, coursesApi } from '@/services/api';
+import { enrollmentsApi } from '@/services/api';
 import { Enrollment, Certificate } from '@/types';
 import { Spinner, Empty, CertCard, PageTitle } from '@/components/shared/index';
 import { useAuth } from '@/context/AuthContext';

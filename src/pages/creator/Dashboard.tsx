@@ -20,7 +20,8 @@ export default function CreatorDashboard() {
 
   if (loading) return <Spinner />;
 
-  if (!user?.is_creator && !user?.is_admin()) {
+  // if (!user?.is_creator && !user?.is_admin()) {
+  if (!user?.is_creator && !user?.roles.includes('admin')) {
     return (
       <div className="fade-in">
         <div className="text-center py-5">

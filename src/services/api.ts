@@ -268,6 +268,18 @@ export const assessmentsApi = {
     api.get('/lesson-assessments/submissions/my', {
       params: { course_id: courseId, assessment_type: assessmentType },
     }),
+  
+  submit: (payload: {
+    assessment_id: number;
+    answers: { question_id: number; response: string }[];
+  }) => api.post('/assessments/submit', payload),
+
+  grade: (payload: {
+    submission_id: number;
+    score: number;
+    tutor_feedback: string;
+  }) => api.post('/assessments/grade', payload),
+  
 };
 
 // ─── PAYMENTS ────────────────────────────────────

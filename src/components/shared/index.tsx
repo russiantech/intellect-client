@@ -79,11 +79,36 @@ export function Spinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 
 
 // ── EMPTY STATE ──────────────────────────────────────────────────────────────
+/*
 export function Empty({ icon = 'bi-inbox', title = 'Nothing here yet', subtitle = '', action }: {
   icon?: string;
   title?: string;
   subtitle?: string;
   action?: { label: string; onClick: () => void; href?: string };
+}) {
+  return (
+    <div className="text-center py-5">
+      <i className={`bi ${icon} text-muted`} style={{ fontSize: '3rem' }} />
+      <h6 className="mt-3 mb-1">{title}</h6>
+      {subtitle && (
+        <p className="text-muted" style={{ fontSize: '0.875rem' }}>{subtitle}</p>
+      )}
+      {action && (
+        action.href
+          ? <Link to={action.href} className="btn btn-primary btn-sm mt-2">{action.label}</Link>
+          : <button className="btn btn-primary btn-sm mt-2" onClick={action.onClick}>{action.label}</button>
+      )}
+    </div>
+  );
+}
+*/
+// v2
+// ── EMPTY STATE ──────────────────────────────────────────────────────────────
+export function Empty({ icon = 'bi-inbox', title = 'Nothing here yet', subtitle = '', action }: {
+  icon?: string;
+  title?: string;
+  subtitle?: string;
+  action?: { label: string; onClick?: () => void; href?: string };
 }) {
   return (
     <div className="text-center py-5">

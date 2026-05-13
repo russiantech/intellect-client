@@ -581,7 +581,8 @@ function emptyEdu(): Education {
 // ── Component ──────────────────────────────────────────────────────────────
 
 export default function ProfileEdit() {
-  const { user, setUser } = useAuth();
+  // const { user, setUser } = useAuth();
+  const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState('personal');
   const [saving, setSaving] = useState(false);
@@ -653,7 +654,7 @@ export default function ProfileEdit() {
     setAvatarUploading(true);
     try {
       const res = await usersApi.uploadAvatar(file);
-      setUser?.({ ...user!, image: res.data.image });
+      updateUser?.({ ...user!, image: res.data.image });
       toast.success('Avatar updated!');
     } catch { toast.error('Avatar upload failed'); }
     finally { setAvatarUploading(false); }
@@ -683,7 +684,7 @@ export default function ProfileEdit() {
           })),
       };
       const res = await usersApi.updateProfile(payload);
-      setUser?.({ ...user!, ...res.data });
+      updateUser?.({ ...user!, ...res.data });
       toast.success('Profile updated!');
     } catch { toast.error('Failed to save changes'); }
     finally { setSaving(false); }

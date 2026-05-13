@@ -592,7 +592,8 @@ export default function Profile() {
         <div className="pf-hero-inner">
           {/* Avatar */}
           <div className="pf-avatar-wrap">
-            <img src={avatarSrc} alt={profile.name || profile.username} className="pf-avatar" />
+            {/* <img src={avatarSrc} alt={profile.name || profile.username} className="pf-avatar" /> */}
+            <img src={avatarSrc || undefined} alt={profile.name || profile.username} className="pf-avatar" />
             {profile.is_online && <span className="pf-online-dot" title="Online now" />}
             {isOwnProfile && (
               <>
