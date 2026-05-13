@@ -24,7 +24,7 @@ export interface User {
   email_verified: boolean;
   is_online: boolean;
   last_seen?: string;
-  roles: UserRole[];
+  roles: string[];
   primary_role: string;
   bank_name?: string;
   bank_account_number?: string;
