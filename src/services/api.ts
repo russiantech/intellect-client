@@ -5,7 +5,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 30000,
+  timeout: 60000,
 });
 
 // Token injection
@@ -19,8 +19,20 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
+
+    // 
+    const { config } = err;
+    
+    // Retry on timeout for GET requests (idempotent)
+    if (err.code === 'ECONNABORTED' && config.method === 'get' && !config.__retryCount) {
+      config.__retryCount = 1;
+      console.warn(`Retrying ${config.url} after timeout...`);
+      return api(config);
+    }
+
     const original = err.config;
     if (err.response?.status === 401 && !original._retry) {
+      
       original._retry = true;
       const refresh = localStorage.getItem('refresh_token');
       if (refresh) {
@@ -279,7 +291,7 @@ export const assessmentsApi = {
     score: number;
     tutor_feedback: string;
   }) => api.post('/assessments/grade', payload),
-  
+
 };
 
 // ─── PAYMENTS ────────────────────────────────────

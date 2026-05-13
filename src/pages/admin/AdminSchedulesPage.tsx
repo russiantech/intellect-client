@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { adminApi, coursesApi, usersApi } from '@/services/api';
-import { Spinner, Empty, PageTitle, Modal, Avatar } from '@/components/shared/index';
+import { Spinner, Empty, PageTitle, Modal } from '@/components/shared/index';
 
 export default function AdminSchedulesPage() {
   const [schedules, setSchedules] = useState<any[]>([]);

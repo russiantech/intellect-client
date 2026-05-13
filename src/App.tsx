@@ -52,11 +52,11 @@ const ProfileEdit      = lazy(() => import('@/pages/shared/user/ProfileEdit'));
 const AdminCourses    = lazy(() => import('@/pages/admin/AdminCourses'));
 // const AdminCourseEditor = lazy(() => import('@/pages/admin/AdminCourseEditor'));
 const AdminUsers      = lazy(() => import('@/pages/admin/AdminUsers'));
-const AdminEnrollments = lazy(() => import('@/pages/admin/AdminEnrollments'));
+const AdminEnrollmentsPage = lazy(() => import('@/pages/admin/AdminEnrollmentsPage'));
 const AdminTeamRequests = lazy(() => import('@/pages/admin/AdminTeamRequests'));
 const AdminBroadcast  = lazy(() => import('@/pages/admin/AdminBroadcast'));
-const AdminPaths      = lazy(() => import('@/pages/admin/AdminPaths'));
-const AdminSchedules  = lazy(() => import('@/pages/admin/AdminSchedules'));
+const AdminPathsPage      = lazy(() => import('@/pages/admin/AdminPathsPage'));
+const AdminSchedulesPage  = lazy(() => import('@/pages/admin/AdminSchedulesPage'));
 const AdminPartnership = lazy(() => import('@/pages/admin/AdminPartnership'));
 const AdminDiscounts  = lazy(() => import('@/pages/admin/AdminDiscounts'));
 const AdminCertificates = lazy(() => import('@/pages/admin/AdminCertificates'));
@@ -221,11 +221,11 @@ export default function App() {
               <Route path="/admin/courses/:id/edit" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCourseEditor /></ProtectedRoute>} /> */}
 
               <Route path="/admin/users" element={<ProtectedRoute roles={['admin','super_admin']}><AdminUsers /></ProtectedRoute>} />
-              <Route path="/admin/enrollments" element={<ProtectedRoute roles={['admin','super_admin']}><AdminEnrollments /></ProtectedRoute>} />
+              <Route path="/admin/enrollments" element={<ProtectedRoute roles={['admin','super_admin']}><AdminEnrollmentsPage /></ProtectedRoute>} />
               <Route path="/admin/team-requests" element={<ProtectedRoute roles={['admin','super_admin']}><AdminTeamRequests /></ProtectedRoute>} />
               <Route path="/admin/broadcast" element={<ProtectedRoute roles={['admin','super_admin']}><AdminBroadcast /></ProtectedRoute>} />
-              <Route path="/admin/paths" element={<ProtectedRoute roles={['admin','super_admin']}><AdminPaths /></ProtectedRoute>} />
-              <Route path="/admin/schedules" element={<ProtectedRoute roles={['admin','super_admin']}><AdminSchedules /></ProtectedRoute>} />
+              <Route path="/admin/paths" element={<ProtectedRoute roles={['admin','super_admin']}><AdminPathsPage /></ProtectedRoute>} />
+              <Route path="/admin/schedules" element={<ProtectedRoute roles={['admin','super_admin']}><AdminSchedulesPage /></ProtectedRoute>} />
               <Route path="/admin/partnerships" element={<ProtectedRoute roles={['admin','super_admin']}><AdminPartnership /></ProtectedRoute>} />
               <Route path="/admin/discounts" element={<ProtectedRoute roles={['admin','super_admin']}><AdminDiscounts /></ProtectedRoute>} />
               <Route path="/admin/certificates" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCertificates /></ProtectedRoute>} />

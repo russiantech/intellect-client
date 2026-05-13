@@ -4,10 +4,10 @@ import toast from 'react-hot-toast';
 import { partnershipsApi } from '@/services/api';
 import { Partnership } from '@/types';
 import { Spinner, Empty, PageTitle, StatCard, Modal } from '@/components/shared/index';
-import { useAuth } from '@/context/AuthContext';
+// import { useAuth } from '@/context/AuthContext';
 
 export default function PartnerDashboard() {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [partnership, setPartnership] = useState<Partnership | null>(null);
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

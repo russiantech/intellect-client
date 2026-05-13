@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { adminApi, coursesApi, usersApi, enrollmentsApi } from '@/services/api';
+import { adminApi, coursesApi, usersApi } from '@/services/api';
 import { Course, User } from '@/types';
-import { Spinner, Empty, PageTitle, Modal, StatusBadge, Avatar, SearchInput } from '@/components/shared/index';
+import { Spinner, Empty, PageTitle, StatusBadge, Avatar, SearchInput } from '@/components/shared/index';
 
 export default function AdminEnrollmentsPage() {
   const [tab, setTab] = useState<'assign' | 'all'>('assign');
