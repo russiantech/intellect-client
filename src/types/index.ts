@@ -181,7 +181,8 @@ export interface Course {
   instructor_led_fee?: number;
   // Payment options from API
   available_payment_types?: PaymentTypeOption[];
-}
+
+  created_at?: string;}
 
 export interface PaymentTypeOption {
   payment_type: string;
@@ -214,7 +215,10 @@ export interface PathCourse extends Course {
 //   is_enrolled?: boolean;
 //   progress_pct?: number;
 //   created_at?: string;
+// 
+  // instructor_led_only?: boolean;
 // }
+
 // v2
 /*
 export interface LearningPath {
@@ -393,6 +397,8 @@ export interface PathCreatePayload {
   pay_as_you_go_fee?: number;
   access_period_days?: number;
   what_you_achieve?: string;
+
+  instructor_led_only?: boolean;
 }
 
 export interface PathUpdatePayload {
@@ -413,7 +419,8 @@ export interface PathUpdatePayload {
   what_you_achieve?: string;
   status?: string;
   is_active?: boolean;
-}
+
+  instructor_led_only?: boolean;}
 
 // 
 export interface Question {
