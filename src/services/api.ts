@@ -32,7 +32,7 @@ api.interceptors.response.use(
 
     const original = err.config;
     if (err.response?.status === 401 && !original._retry) {
-      
+
       original._retry = true;
       const refresh = localStorage.getItem('refresh_token');
       if (refresh) {
@@ -226,6 +226,7 @@ export const attendanceApi = {
 };
 
 // ─── PATHS ────────────────────────────────────────
+/*
 export const pathsApi = {
   list:       (params?: any)                   => api.get('/paths/', { params }),
   get:        (id: number)                     => api.get(`/paths/${id}`),
@@ -235,6 +236,37 @@ export const pathsApi = {
   addCourse:  (pathId: number, courseId: number) => api.post(`/paths/${pathId}/courses/${courseId}`),
   removeCourse:(pathId: number, courseId: number) => api.delete(`/paths/${pathId}/courses/${courseId}`),
 };
+*/
+// services/api.ts
+/**
+ * API service updates — add slug-based path endpoints
+ * Add these to your existing api.ts file
+ */
+
+// In your pathsApi object, add:
+export const pathsApi = {
+  list: (params?: any) => api.get('/paths/', { params }),
+
+  // NEW: Get by slug (primary public endpoint)
+  getBySlug: (slug: string) => api.get(`/paths/by-slug/${slug}`),
+
+  // Keep for admin/backward compatibility
+  // get: (id: number) => api.get(`/paths/${id}`),
+  get: (slugOrId: string | number) => axios.get(`/paths/${slugOrId}/`),
+
+  create: (data: any) => api.post('/paths/', data),
+  update: (id: number, data: any) => api.put(`/paths/${id}`, data),
+  delete: (id: number) => api.delete(`/paths/${id}`),
+  addCourse: (pathId: number, courseId: number) => 
+    api.post(`/paths/${pathId}/courses/${courseId}`),
+  removeCourse: (pathId: number, courseId: number) => 
+    api.delete(`/paths/${pathId}/courses/${courseId}`),
+};
+
+// Also update your router to use slug:
+// In your React Router config:
+// <Route path="/paths/:slug" element={<PathDetail />} />
+// NOT: <Route path="/paths/:id" element={<PathDetail />} />
 
 // ─── ASSESSMENTS (Lesson-level) ───────────────────
 /*

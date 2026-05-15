@@ -31,7 +31,7 @@ export default function PathsPage() {
                     {p.fee > 0 ? <span className="fw-700 text-primary">₦{p.fee.toLocaleString()}</span> : <span className="badge bg-success">Free</span>}
                   </div>
                   {p.is_enrolled && (<div className="mb-3"><div className="progress" style={{ height: 4 }}><div className="progress-bar" style={{ width: `${p.progress_pct || 0}%` }} /></div></div>)}
-                  <Link to={`/paths/${p.id}`} className="btn btn-outline-primary w-100 mt-auto">{p.is_enrolled ? 'Continue Path' : 'View Path'}</Link>
+                  <Link to={`/paths/${p.slug}`} className="btn btn-outline-primary w-100 mt-auto">{p.is_enrolled ? 'Continue Path' : 'View Path'}</Link>
                 </div>
               </div>
             </div>

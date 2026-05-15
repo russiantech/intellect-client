@@ -1,0 +1,540 @@
+/* PathDetail.css — Professional, consistent with CourseDetail */
+
+.pd-root {
+  --pd-radius: 0.75rem;
+  --pd-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --pd-primary-light: rgba(13, 110, 253, 0.08);
+}
+
+/* Breadcrumb */
+.pd-breadcrumb {
+  margin-bottom: 1rem;
+  font-size: 0.8rem;
+}
+.pd-breadcrumb .breadcrumb-item a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.pd-breadcrumb .breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+
+/* Header */
+.pd-header {
+  background: #fff;
+  border-radius: var(--pd-radius);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--pd-shadow);
+}
+.pd-badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+.pd-badge-featured {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pd-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+.pd-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+.pd-meta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.pd-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.pd-rating-val {
+  font-weight: 700;
+  color: var(--warning);
+}
+.pd-creator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+.pd-creator-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.pd-creator-role {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Section cards */
+.pd-section-card {
+  background: #fff;
+  border-radius: var(--pd-radius);
+  box-shadow: var(--pd-shadow);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.pd-card-pad {
+  padding: 1.5rem;
+}
+.pd-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.pd-section-header h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.pd-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Courses list */
+.pd-courses-list {
+  padding: 0.5rem 0;
+}
+.pd-course-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s ease;
+}
+.pd-course-item:last-child {
+  border-bottom: none;
+}
+.pd-course-item:hover {
+  background: var(--pd-primary-light);
+}
+.pd-course-number {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.pd-course-info {
+  flex: 1;
+  min-width: 0;
+}
+.pd-course-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+.pd-course-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.pd-course-level {
+  text-transform: capitalize;
+  font-weight: 500;
+}
+.pd-course-thumb {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 0.4rem;
+  flex-shrink: 0;
+}
+
+/* Achieve list */
+.pd-achieve-list {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+}
+.pd-achieve-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+.pd-achieve-item i {
+  color: var(--success);
+  font-size: 1.1rem;
+  margin-top: 0.1rem;
+}
+
+/* Empty state */
+.pd-empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.pd-empty-state i {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   Sidebar — Enrollment Card
+   ════════════════════════════════════════════════════════════════ */
+.pd-enroll-card {
+  background: #fff;
+  border-radius: var(--pd-radius);
+  box-shadow: var(--pd-shadow);
+  overflow: hidden;
+  position: sticky;
+  top: calc(var(--nav-height, 0px) + 1rem);
+}
+.pd-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+.pd-thumb-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  gap: 0.5rem;
+}
+.pd-thumb-placeholder i {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+.pd-thumb-placeholder span {
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+.pd-enroll-body {
+  padding: 1.25rem;
+}
+
+/* Payment selector */
+.pd-payment-selector {
+  margin-bottom: 1rem;
+}
+.pd-payment-selector-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+.pd-payment-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.pd-payment-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 0.5rem;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.75rem;
+  min-width: 70px;
+}
+.pd-payment-pill:hover {
+  border-color: var(--primary);
+  background: var(--pd-primary-light);
+}
+.pd-payment-pill.active {
+  border-color: var(--primary);
+  background: var(--pd-primary-light);
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15);
+}
+.pd-payment-pill-label {
+  font-weight: 600;
+  color: var(--text);
+}
+.pd-payment-pill-price {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.8rem;
+}
+.pd-payment-pill-price.free {
+  color: var(--success);
+}
+
+/* Price block */
+.pd-price-cta-row {
+  margin-bottom: 1rem;
+}
+.pd-price-block {
+  margin-bottom: 0.75rem;
+}
+.pd-price-main {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pd-price-original {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+.pd-price-free {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--success);
+}
+.pd-price-savings {
+  font-size: 0.78rem;
+  color: var(--success);
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+.pd-price-breakdown {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+.pd-price-type {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+.pd-price-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+  line-height: 1.4;
+}
+
+/* CTA Button */
+.pd-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+.pd-cta-btn.primary {
+  background: var(--primary);
+  color: #fff;
+}
+.pd-cta-btn.primary:hover:not(:disabled) {
+  background: #0b5ed7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+}
+.pd-cta-btn.success {
+  background: var(--success);
+  color: #fff;
+}
+.pd-cta-btn.success:hover {
+  background: #198754;
+}
+.pd-cta-btn.disabled {
+  background: var(--border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+.pd-cta-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.pd-progress-badge {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-left: 0.25rem;
+}
+
+/* Instructor-led toggle */
+.pd-instructor-led-toggle {
+  background: var(--pd-primary-light);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+.pd-il-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+  margin: 0;
+}
+.pd-il-content {
+  flex: 1;
+}
+.pd-il-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.pd-il-title .badge {
+  font-size: 0.65rem;
+  vertical-align: middle;
+}
+.pd-il-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  line-height: 1.4;
+}
+
+/* Not ready notice */
+.pd-not-ready {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: #856404;
+}
+.pd-not-ready i {
+  font-size: 1.25rem;
+  margin-top: 0.1rem;
+}
+.pd-not-ready strong {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.1rem;
+}
+.pd-not-ready span {
+  font-size: 0.78rem;
+  opacity: 0.9;
+}
+
+/* Discount row */
+.pd-discount-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.pd-discount-row input {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+.pd-discount-row button {
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+/* Includes list */
+.pd-includes {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+.pd-include-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  padding: 0.35rem 0;
+}
+.pd-include-item i {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   Mobile Sticky CTA
+   ════════════════════════════════════════════════════════════════ */
+.pd-sticky-cta {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  z-index: 1000;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+.pd-sticky-price {
+  display: flex;
+  flex-direction: column;
+}
+.pd-sticky-price-main {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.pd-sticky-price-orig {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+.pd-sticky-price.enrolled {
+  color: var(--success);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 991.98px) {
+  .pd-sticky-cta {
+    display: flex;
+  }
+  .pd-enroll-card {
+    position: static;
+  }
+}

@@ -6,10 +6,6 @@ import Layout from '@/components/layout/Layout';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { CREATOR_PERMISSIONS, ADMIN_PERMISSIONS } from './pages/shared/courses/Courseeditorpermissions';
 
-// import { ForgotPassword } from '@/pages/auth/ForgotPassword';
-// import { ResetPassword } from '@/pages/auth/ResetPassword';
-// import VerifySignup from './pages/auth/VerifySignup';
-
 // ── Lazy Pages ─────────────────────────────────
 
 // Auth
@@ -130,147 +126,246 @@ function PublicRoute({ children }: { children: JSX.Element }) {
 }
 
 // ── App ─────────────────────────────────────────
+// export default function App() {
+//   return (
+//     <ThemeProvider>
+//       <AuthProvider>
+//       <BrowserRouter>
+//         <Suspense fallback={<Loader />}>
+//           <Routes>
+
+//             {/* Public Auth */}
+//             <Route path="/auth/signin" element={<PublicRoute><Signin /></PublicRoute>} />
+//             <Route path="/auth/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+//             <Route path="/auth/verify-signup" element={<VerifySignup />} />
+//             <Route path="/auth/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+//             <Route path="/auth/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+
+//             {/* App shell with nav + sidebar */}
+//             <Route element={<Layout />}>
+//               {/* Public */}
+//               <Route path="/" element={<Home />} />
+//               <Route path="/explore" element={<Explore />} />
+//               <Route path="/courses/:slug" element={<CourseDetail />} />
+//               <Route path="/paths" element={<PathsPage />} />
+//               {/* <Route path="/paths/:id" element={<PathDetail />} /> */}
+//               <Route path="/paths/:slug" element={<PathDetail />} />
+//               <Route path="/about" element={<AboutPage />} />
+//               <Route path="/search" element={<SearchResults />} />
+
+//               {/* Instructors */}
+//               <Route path="/instructors" element={<InstructorsPage />} />
+//               <Route path="/instructors/:username" element={<InstructorsProfile />} />
+
+//               {/* Payment callback */}
+//               <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
+//               <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+//               <Route path="/messages/:partnerId" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+
+//               {/* Learning player */}
+//               <Route path="/learn/:slug" element={<ProtectedRoute><LearnPage /></ProtectedRoute>} />
+
+//               {/* Student */}
+//               <Route path="/dashboard" element={<ProtectedRoute><StudentDash /></ProtectedRoute>} />
+//               <Route path="/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
+//               <Route path="/my-certificates" element={<ProtectedRoute><MyCerts /></ProtectedRoute>} />
+//               <Route path="/my-assessments" element={<ProtectedRoute><MyAssessments /></ProtectedRoute>} />
+//               <Route path="/my-assessments/:assessmentId/take" element={<ProtectedRoute><TakeAssessment /></ProtectedRoute>} />
+              
+//               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+//               <Route path="/profile/edit" element={<ProfileEdit />} />
+//               <Route path="/profile/:username" element={<Profile />} />
+
+//               {/* Tutor */}
+//               <Route path="/tutor" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorDash /></ProtectedRoute>} />
+//               <Route path="/tutor/courses" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorCourses /></ProtectedRoute>} />
+//               <Route path="/tutor/assessments" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorAssessments /></ProtectedRoute>} />
+//               <Route path="/tutor/students" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorStudents /></ProtectedRoute>} />
+//               <Route path="/tutor/schedules" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorSchedules /></ProtectedRoute>} />
+//               <Route path="/tutor/schedules/:scheduleId/attendance" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><MarkAttendance /></ProtectedRoute>} />
+
+//               {/* Creator Routes */}
+//               <Route path="/creator" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorDash /></ProtectedRoute>} />
+//               <Route path="/creator/courses" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorCourses /></ProtectedRoute>} />
+//               {/*
+//               Creators see no delete button, no status/featured controls,
+//               and reach the "Submit for Review" flow in the Publish step.
+//               ─────────────────────────────────────────────────────────── */}
+//               <Route
+//                 path="/creator/courses/new"
+//                 element={
+//                   <ProtectedRoute roles={['creator', 'admin', 'super_admin']}>
+//                     <CourseEditor permissions={CREATOR_PERMISSIONS} />
+//                   </ProtectedRoute>
+//                 }
+//               />
+//               <Route
+//                 path="/creator/courses/:id/edit"
+//                 element={
+//                   <ProtectedRoute roles={['creator', 'admin', 'super_admin']}>
+//                     <CourseEditor permissions={CREATOR_PERMISSIONS} />
+//                   </ProtectedRoute>
+//                 }
+//               />
+//               <Route path="/creator/students" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorStudents /></ProtectedRoute>} />
+//               <Route path="/creator/earnings" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorEarnings /></ProtectedRoute>} />
+
+//               {/* Admin */}
+//               <Route path="/admin" element={<ProtectedRoute roles={['admin','super_admin']}><AdminDash /></ProtectedRoute>} />
+
+//               <Route path="/admin/courses" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCourses /></ProtectedRoute>} />
+//               {/* <Route path="/admin/courses/new" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCourseEditor /></ProtectedRoute>} />
+//               <Route path="/admin/courses/:id/edit" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCourseEditor /></ProtectedRoute>} /> */}
+
+//               <Route path="/admin/users" element={<ProtectedRoute roles={['admin','super_admin']}><AdminUsers /></ProtectedRoute>} />
+//               <Route path="/admin/enrollments" element={<ProtectedRoute roles={['admin','super_admin']}><AdminEnrollmentsPage /></ProtectedRoute>} />
+//               <Route path="/admin/team-requests" element={<ProtectedRoute roles={['admin','super_admin']}><AdminTeamRequests /></ProtectedRoute>} />
+//               <Route path="/admin/broadcast" element={<ProtectedRoute roles={['admin','super_admin']}><AdminBroadcast /></ProtectedRoute>} />
+//               <Route path="/admin/paths" element={<ProtectedRoute roles={['admin','super_admin']}><AdminPathsPage /></ProtectedRoute>} />
+//               <Route path="/admin/schedules" element={<ProtectedRoute roles={['admin','super_admin']}><AdminSchedulesPage /></ProtectedRoute>} />
+//               <Route path="/admin/partnerships" element={<ProtectedRoute roles={['admin','super_admin']}><AdminPartnership /></ProtectedRoute>} />
+//               <Route path="/admin/discounts" element={<ProtectedRoute roles={['admin','super_admin']}><AdminDiscounts /></ProtectedRoute>} />
+//               <Route path="/admin/certificates" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCertificates /></ProtectedRoute>} />
+//               <Route path="/admin/settings" element={<ProtectedRoute roles={['admin','super_admin']}><AdminSettings /></ProtectedRoute>} />
+//               <Route path="/admin/courses/:courseId/revenue" element={<ProtectedRoute roles={['admin','super_admin']}><CourseRevenueConfig /></ProtectedRoute>} />
+                
+//                {/* 
+//                Admins get status editing, featured toggle, direct publish,
+//                 unpublish, and hard-delete on the Publish step.
+//                 ─────────────────────────────────────────────────────────── */}
+//               <Route
+//                 path="/admin/courses/new"
+//                 element={
+//                   <ProtectedRoute roles={['admin', 'super_admin']}>
+//                     <CourseEditor permissions={ADMIN_PERMISSIONS} />
+//                   </ProtectedRoute>
+//                 }
+//               />
+//               <Route
+//                 path="/admin/courses/:id/edit"
+//                 element={
+//                   <ProtectedRoute roles={['admin', 'super_admin']}>
+//                     <CourseEditor permissions={ADMIN_PERMISSIONS} />
+//                   </ProtectedRoute>
+//                 }
+//               />
+
+//               {/* Partner */}
+//               <Route path="/partner" element={<ProtectedRoute roles={['partner','admin','super_admin']}><PartnerDash /></ProtectedRoute>} />
+//             </Route>
+
+//             <Route path="*" element={<NotFound />} />
+//           </Routes>
+//         </Suspense>
+//         <Toaster
+//           position="top-right"
+//           toastOptions={{
+//             duration: 4000,
+//             style: { background: '#363636', color: '#fff', borderRadius: '8px', fontSize: '14px' },
+//             success: { style: { background: '#065f46', color: '#fff' } },
+//             error: { style: { background: '#991b1b', color: '#fff' } },
+//           }}
+//         />
+//       </BrowserRouter>
+//     </AuthProvider>
+//     </ThemeProvider>
+//   );
+// }
+
+
+// v2
+// ── App ─────────────────────────────────────────
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
       <BrowserRouter>
-        <Suspense fallback={<Loader />}>
-          <Routes>
+        <AuthProvider>
+          <Suspense fallback={<Loader />}>
+            <Routes>
 
-            {/* Public Auth */}
-            <Route path="/auth/signin" element={<PublicRoute><Signin /></PublicRoute>} />
-            <Route path="/auth/signup" element={<PublicRoute><Signup /></PublicRoute>} />
-            <Route path="/auth/verify-signup" element={<VerifySignup />} />
-            <Route path="/auth/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
-            <Route path="/auth/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
+              {/* Public Auth */}
+              <Route path="/auth/signin" element={<PublicRoute><Signin /></PublicRoute>} />
+              <Route path="/auth/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+              <Route path="/auth/verify-signup" element={<VerifySignup />} />
+              <Route path="/auth/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+              <Route path="/auth/reset-password" element={<PublicRoute><ResetPassword /></PublicRoute>} />
 
-            {/* App shell with nav + sidebar */}
-            <Route element={<Layout />}>
-              {/* Public */}
-              <Route path="/" element={<Home />} />
-              <Route path="/explore" element={<Explore />} />
-              <Route path="/courses/:slug" element={<CourseDetail />} />
-              <Route path="/paths" element={<PathsPage />} />
-              <Route path="/paths/:id" element={<PathDetail />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/search" element={<SearchResults />} />
+              {/* App shell */}
+              <Route element={<Layout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/courses/:slug" element={<CourseDetail />} />
+                <Route path="/paths" element={<PathsPage />} />
+                <Route path="/paths/:slug" element={<PathDetail />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/search" element={<SearchResults />} />
+                <Route path="/instructors" element={<InstructorsPage />} />
+                <Route path="/instructors/:username" element={<InstructorsProfile />} />
+                <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
+                <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+                <Route path="/messages/:partnerId" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+                <Route path="/learn/:slug" element={<ProtectedRoute><LearnPage /></ProtectedRoute>} />
+                <Route path="/dashboard" element={<ProtectedRoute><StudentDash /></ProtectedRoute>} />
+                <Route path="/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
+                <Route path="/my-certificates" element={<ProtectedRoute><MyCerts /></ProtectedRoute>} />
+                <Route path="/my-assessments" element={<ProtectedRoute><MyAssessments /></ProtectedRoute>} />
+                <Route path="/my-assessments/:assessmentId/take" element={<ProtectedRoute><TakeAssessment /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/profile/edit" element={<ProfileEdit />} />
+                <Route path="/profile/:username" element={<Profile />} />
 
-              {/* Instructors */}
-              <Route path="/instructors" element={<InstructorsPage />} />
-              <Route path="/instructors/:username" element={<InstructorsProfile />} />
+                {/* Tutor */}
+                <Route path="/tutor" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorDash /></ProtectedRoute>} />
+                <Route path="/tutor/courses" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorCourses /></ProtectedRoute>} />
+                <Route path="/tutor/assessments" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorAssessments /></ProtectedRoute>} />
+                <Route path="/tutor/students" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorStudents /></ProtectedRoute>} />
+                <Route path="/tutor/schedules" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorSchedules /></ProtectedRoute>} />
+                <Route path="/tutor/schedules/:scheduleId/attendance" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><MarkAttendance /></ProtectedRoute>} />
 
-              {/* Payment callback */}
-              <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
-              <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
-              <Route path="/messages/:partnerId" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
+                {/* Creator */}
+                <Route path="/creator" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorDash /></ProtectedRoute>} />
+                <Route path="/creator/courses" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorCourses /></ProtectedRoute>} />
+                <Route path="/creator/courses/new" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CourseEditor permissions={CREATOR_PERMISSIONS} /></ProtectedRoute>} />
+                <Route path="/creator/courses/:id/edit" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CourseEditor permissions={CREATOR_PERMISSIONS} /></ProtectedRoute>} />
+                <Route path="/creator/students" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorStudents /></ProtectedRoute>} />
+                <Route path="/creator/earnings" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorEarnings /></ProtectedRoute>} />
 
-              {/* Learning player */}
-              <Route path="/learn/:slug" element={<ProtectedRoute><LearnPage /></ProtectedRoute>} />
+                {/* Admin */}
+                <Route path="/admin" element={<ProtectedRoute roles={['admin','super_admin']}><AdminDash /></ProtectedRoute>} />
+                <Route path="/admin/courses" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCourses /></ProtectedRoute>} />
+                <Route path="/admin/users" element={<ProtectedRoute roles={['admin','super_admin']}><AdminUsers /></ProtectedRoute>} />
+                <Route path="/admin/enrollments" element={<ProtectedRoute roles={['admin','super_admin']}><AdminEnrollmentsPage /></ProtectedRoute>} />
+                <Route path="/admin/team-requests" element={<ProtectedRoute roles={['admin','super_admin']}><AdminTeamRequests /></ProtectedRoute>} />
+                <Route path="/admin/broadcast" element={<ProtectedRoute roles={['admin','super_admin']}><AdminBroadcast /></ProtectedRoute>} />
+                <Route path="/admin/paths" element={<ProtectedRoute roles={['admin','super_admin']}><AdminPathsPage /></ProtectedRoute>} />
+                <Route path="/admin/schedules" element={<ProtectedRoute roles={['admin','super_admin']}><AdminSchedulesPage /></ProtectedRoute>} />
+                <Route path="/admin/partnerships" element={<ProtectedRoute roles={['admin','super_admin']}><AdminPartnership /></ProtectedRoute>} />
+                <Route path="/admin/discounts" element={<ProtectedRoute roles={['admin','super_admin']}><AdminDiscounts /></ProtectedRoute>} />
+                <Route path="/admin/certificates" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCertificates /></ProtectedRoute>} />
+                <Route path="/admin/settings" element={<ProtectedRoute roles={['admin','super_admin']}><AdminSettings /></ProtectedRoute>} />
+                <Route path="/admin/courses/:courseId/revenue" element={<ProtectedRoute roles={['admin','super_admin']}><CourseRevenueConfig /></ProtectedRoute>} />
+                <Route path="/admin/courses/new" element={<ProtectedRoute roles={['admin','super_admin']}><CourseEditor permissions={ADMIN_PERMISSIONS} /></ProtectedRoute>} />
+                <Route path="/admin/courses/:id/edit" element={<ProtectedRoute roles={['admin','super_admin']}><CourseEditor permissions={ADMIN_PERMISSIONS} /></ProtectedRoute>} />
 
-              {/* Student */}
-              <Route path="/dashboard" element={<ProtectedRoute><StudentDash /></ProtectedRoute>} />
-              <Route path="/my-courses" element={<ProtectedRoute><MyCourses /></ProtectedRoute>} />
-              <Route path="/my-certificates" element={<ProtectedRoute><MyCerts /></ProtectedRoute>} />
-              <Route path="/my-assessments" element={<ProtectedRoute><MyAssessments /></ProtectedRoute>} />
-              <Route path="/my-assessments/:assessmentId/take" element={<ProtectedRoute><TakeAssessment /></ProtectedRoute>} />
-              
-              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-              <Route path="/profile/edit" element={<ProfileEdit />} />
-              <Route path="/profile/:username" element={<Profile />} />
+                {/* Partner */}
+                <Route path="/partner" element={<ProtectedRoute roles={['partner','admin','super_admin']}><PartnerDash /></ProtectedRoute>} />
+              </Route>
 
-              {/* Tutor */}
-              <Route path="/tutor" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorDash /></ProtectedRoute>} />
-              <Route path="/tutor/courses" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorCourses /></ProtectedRoute>} />
-              <Route path="/tutor/assessments" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorAssessments /></ProtectedRoute>} />
-              <Route path="/tutor/students" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorStudents /></ProtectedRoute>} />
-              <Route path="/tutor/schedules" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><TutorSchedules /></ProtectedRoute>} />
-              <Route path="/tutor/schedules/:scheduleId/attendance" element={<ProtectedRoute roles={['tutor','admin','super_admin']}><MarkAttendance /></ProtectedRoute>} />
-
-              {/* Creator Routes */}
-              <Route path="/creator" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorDash /></ProtectedRoute>} />
-              <Route path="/creator/courses" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorCourses /></ProtectedRoute>} />
-              {/*
-              Creators see no delete button, no status/featured controls,
-              and reach the "Submit for Review" flow in the Publish step.
-              ─────────────────────────────────────────────────────────── */}
-              <Route
-                path="/creator/courses/new"
-                element={
-                  <ProtectedRoute roles={['creator', 'admin', 'super_admin']}>
-                    <CourseEditor permissions={CREATOR_PERMISSIONS} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/creator/courses/:id/edit"
-                element={
-                  <ProtectedRoute roles={['creator', 'admin', 'super_admin']}>
-                    <CourseEditor permissions={CREATOR_PERMISSIONS} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/creator/students" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorStudents /></ProtectedRoute>} />
-              <Route path="/creator/earnings" element={<ProtectedRoute roles={['creator','admin','super_admin']}><CreatorEarnings /></ProtectedRoute>} />
-
-              {/* Admin */}
-              <Route path="/admin" element={<ProtectedRoute roles={['admin','super_admin']}><AdminDash /></ProtectedRoute>} />
-
-              <Route path="/admin/courses" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCourses /></ProtectedRoute>} />
-              {/* <Route path="/admin/courses/new" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCourseEditor /></ProtectedRoute>} />
-              <Route path="/admin/courses/:id/edit" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCourseEditor /></ProtectedRoute>} /> */}
-
-              <Route path="/admin/users" element={<ProtectedRoute roles={['admin','super_admin']}><AdminUsers /></ProtectedRoute>} />
-              <Route path="/admin/enrollments" element={<ProtectedRoute roles={['admin','super_admin']}><AdminEnrollmentsPage /></ProtectedRoute>} />
-              <Route path="/admin/team-requests" element={<ProtectedRoute roles={['admin','super_admin']}><AdminTeamRequests /></ProtectedRoute>} />
-              <Route path="/admin/broadcast" element={<ProtectedRoute roles={['admin','super_admin']}><AdminBroadcast /></ProtectedRoute>} />
-              <Route path="/admin/paths" element={<ProtectedRoute roles={['admin','super_admin']}><AdminPathsPage /></ProtectedRoute>} />
-              <Route path="/admin/schedules" element={<ProtectedRoute roles={['admin','super_admin']}><AdminSchedulesPage /></ProtectedRoute>} />
-              <Route path="/admin/partnerships" element={<ProtectedRoute roles={['admin','super_admin']}><AdminPartnership /></ProtectedRoute>} />
-              <Route path="/admin/discounts" element={<ProtectedRoute roles={['admin','super_admin']}><AdminDiscounts /></ProtectedRoute>} />
-              <Route path="/admin/certificates" element={<ProtectedRoute roles={['admin','super_admin']}><AdminCertificates /></ProtectedRoute>} />
-              <Route path="/admin/settings" element={<ProtectedRoute roles={['admin','super_admin']}><AdminSettings /></ProtectedRoute>} />
-              <Route path="/admin/courses/:courseId/revenue" element={<ProtectedRoute roles={['admin','super_admin']}><CourseRevenueConfig /></ProtectedRoute>} />
-                
-               {/* 
-               Admins get status editing, featured toggle, direct publish,
-                unpublish, and hard-delete on the Publish step.
-                ─────────────────────────────────────────────────────────── */}
-              <Route
-                path="/admin/courses/new"
-                element={
-                  <ProtectedRoute roles={['admin', 'super_admin']}>
-                    <CourseEditor permissions={ADMIN_PERMISSIONS} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/admin/courses/:id/edit"
-                element={
-                  <ProtectedRoute roles={['admin', 'super_admin']}>
-                    <CourseEditor permissions={ADMIN_PERMISSIONS} />
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* Partner */}
-              <Route path="/partner" element={<ProtectedRoute roles={['partner','admin','super_admin']}><PartnerDash /></ProtectedRoute>} />
-            </Route>
-
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: { background: '#363636', color: '#fff', borderRadius: '8px', fontSize: '14px' },
-            success: { style: { background: '#065f46', color: '#fff' } },
-            error: { style: { background: '#991b1b', color: '#fff' } },
-          }}
-        />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: { background: '#363636', color: '#fff', borderRadius: '8px', fontSize: '14px' },
+              success: { style: { background: '#065f46', color: '#fff' } },
+              error: { style: { background: '#991b1b', color: '#fff' } },
+            }}
+          />
+        </AuthProvider>
       </BrowserRouter>
-    </AuthProvider>
     </ThemeProvider>
   );
 }
+
