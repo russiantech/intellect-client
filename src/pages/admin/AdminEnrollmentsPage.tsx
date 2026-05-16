@@ -517,7 +517,7 @@ export default function AdminEnrollmentsPage() {
                           <td>
                             <div className="fw-600" style={{ fontSize: '0.875rem' }}>{e.course?.title}</div>
                             <div className="text-muted" style={{ fontSize: '0.72rem' }}>
-                              {e.course?.creator_name} · {e.completed_topics} topics done
+                              {e.course?.creator?.name} · {e.completed_topics} topics done
                             </div>
                           </td>
                           <td>
