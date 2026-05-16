@@ -113,6 +113,7 @@ function paymentDescription(opt: PaymentOption): string {
  * otherwise synthesises a single-item list from the course's own fields
  * so the pill-switcher UI is always consistent.
  */
+/*
 function derivePaymentOptions(course: Course): PaymentOption[] {
   const raw: any[] = (course as any).available_payment_types ?? [];
   if (raw.length > 0) {
@@ -132,7 +133,54 @@ function derivePaymentOptions(course: Course): PaymentOption[] {
     label:                 paymentTypeLabel(course.payment_type, (course as any).subscription_interval),
   }];
 }
+*/
+// v2
+// ═══════════════════════════════════════════════════════════════════════════
+// CHANGE 1 of 4 — derivePaymentOptions (~line 116)
+//
+// Replace the existing derivePaymentOptions function with this version.
+// The fallback branch now reads subscription_fee / pay_as_you_go_fee from
+// the course object (returned by the updated backend _course_dict) instead
+// of always using the generic `fee` column.
+// ═══════════════════════════════════════════════════════════════════════════
 
+function derivePaymentOptions(course: Course): PaymentOption[] {
+  const raw: any[] = (course as any).available_payment_types ?? [];
+  if (raw.length > 0) {
+    return raw.map((r: any) => ({
+      payment_type:          r.payment_type,
+      fee:                   Number(r.fee ?? 0),
+      subscription_interval: r.subscription_interval,
+      access_period_days:    r.access_period_days,
+      label:                 paymentTypeLabel(r.payment_type, r.subscription_interval),
+    }));
+  }
+ 
+  // Fallback: synthesise from individual course fields
+  const type = course.payment_type ?? 'one_time';
+  let fee: number;
+ 
+  if (type === 'free') {
+    fee = 0;
+  } else if (type === 'subscription') {
+    // subscription_fee is the recurring charge; fall back to fee
+    fee = Number((course as any).subscription_fee || course.fee || 0);
+  } else if (type === 'pay_as_you_go') {
+    // pay_as_you_go_fee is the per-window charge; fall back to fee
+    fee = Number((course as any).pay_as_you_go_fee || course.fee || 0);
+  } else {
+    fee = Number(course.fee || 0);
+  }
+ 
+  return [{
+    payment_type:          type,
+    fee,
+    subscription_interval: (course as any).subscription_interval,
+    access_period_days:    (course as any).access_period_days ?? 30,
+    label:                 paymentTypeLabel(type, (course as any).subscription_interval),
+  }];
+}
+ 
 /* ═══════════════════════════════════════════════════════════
    usePaystackInline
    ───────────────────────────────────────────────────────────
@@ -691,10 +739,16 @@ const handleEnroll = async () => {
     /* ──────────────────────────────────────────────────────────
      * FREE ENROLLMENT
      * ────────────────────────────────────────────────────────── */
-    if (
-      selectedPayment.payment_type === 'free' ||
-      Number(totalPrice) <= 0
-    ) {
+    // if (
+    //   selectedPayment.payment_type === 'free' ||
+    //   Number(totalPrice) <= 0
+    // ) {
+    // v2
+        if (selectedPayment.payment_type === 'free') {
+    // Only explicitly free courses skip Paystack.
+    // totalPrice <= 0 is NOT a safe free-enrollment trigger:
+    // a misconfigured subscription/PAYG with fee=0 would bypass payment.
+ 
       await enrollmentsApi.enroll(course.id);
 
       toast.success('Enrolled successfully!');
@@ -857,7 +911,15 @@ const handleEnroll = async () => {
   if (!course || !selectedPayment) return null;
 
   /* ── Derived values ── */
-  const isFree     = selectedPayment.payment_type === 'free' || selectedPayment.fee === 0;
+  // const isFree     = selectedPayment.payment_type === 'free' || selectedPayment.fee === 0;
+  // v2
+  const isFree = selectedPayment.payment_type === 'free';
+  // NOTE: Do NOT use `selectedPayment.fee === 0` here.
+  // A subscription or pay_as_you_go course whose generic fee column is 0
+  // (because its actual charge lives in subscription_fee / pay_as_you_go_fee)
+  // must go through the Paystack paid flow, not silently enroll for free.
+ 
+ 
   const isEnrolled = !!course.is_enrolled;
   const isReady    = courseIsReady(course);
   const progress   = course.progress_pct ?? 0;
@@ -962,6 +1024,17 @@ const handleEnroll = async () => {
           )}
         </span>
 
+        {selectedPayment.payment_type === 'subscription' && (
+          <div className="cd-price-type" style={{ marginTop: '0.1rem' }}>
+            per {selectedPayment.subscription_interval ?? 'month'}
+          </div>
+        )}
+        {selectedPayment.payment_type === 'pay_as_you_go' && (
+          <div className="cd-price-type" style={{ marginTop: '0.1rem' }}>
+            per {selectedPayment.access_period_days ?? 30} days
+          </div>
+        )}
+
         {discountInfo?.valid && (
           <div className="cd-price-savings">You save ₦{discountInfo.savings.toLocaleString()}</div>
         )}
@@ -1023,8 +1096,8 @@ const handleEnroll = async () => {
       >
         {enrolling ? spinning : (
           <>
-            <i className={`bi ${totalPrice === 0 ? 'bi-lightning-fill' : 'bi-lock-fill'}`} />
-            {totalPrice === 0
+            <i className={`bi ${isFree ? 'bi-lightning-fill' : 'bi-lock-fill'}`} />
+            {isFree
               ? 'Enroll for Free'
               : `Enroll · ₦${totalPrice.toLocaleString()}`}
           </>
@@ -1400,7 +1473,7 @@ const handleEnroll = async () => {
                 disabled={enrolling}
               >
                 <i className="bi bi-lightning-fill" />
-                {totalPrice === 0 ? 'Enroll for Free' : `Enroll · ₦${totalPrice.toLocaleString()}`}
+                {isFree ? 'Enroll for Free' : `Enroll · ₦${totalPrice.toLocaleString()}`}
               </button>
             </div>
           </div>

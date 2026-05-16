@@ -366,6 +366,79 @@ export const adminApi = {
   enrollUser:         (userId: number, courseId: number) =>
     api.post('/admin/enroll-user', null, { params: { user_id: userId, course_id: courseId } }),
   listCertificates:   (params?: any)           => api.get('/admin/certificates', { params }),
+
+  // 
+  
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN ENROLLMENT MANAGEMENT API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// // Course Enrollments
+// listCourseEnrollments: (params?: Record<string, unknown>) => api.get('/admin/enrollments/courses', { params }),
+// listPathEnrollments: (params?: Record<string, unknown>) => api.get('/admin/enrollments/paths', { params }),
+
+// deenrollFromCourse: (enrollmentId: number, reason?: string) => 
+//   api.post(`/admin/enrollments/courses/${enrollmentId}/deenroll`, { reason }),
+// deenrollFromPath: (pathEnrollmentId: number, reason?: string) => 
+//   api.post(`/admin/enrollments/paths/${pathEnrollmentId}/deenroll`, { reason }),
+
+// // Analytics
+// getCourseAnalytics: (courseId: number, periodDays: number = 30) => 
+//   api.get(`/admin/enrollments/analytics/courses/${courseId}`, { params: { period_days: periodDays } }),
+// getPathAnalytics: (pathId: number, periodDays: number = 30) => 
+//   api.get(`/admin/enrollments/analytics/paths/${pathId}`, { params: { period_days: periodDays } }),
+// getGlobalAnalytics: (periodDays: number = 30) => 
+//   api.get('/admin/enrollments/analytics/global', { params: { period_days: periodDays } }),
+
+// // User Tracking
+// getUserEnrollments: (userId: number, params?: Record<string, unknown>) => 
+//   api.get(`/users/${userId}/enrollments`, { params }),
+// getUserPathEnrollments: (userId: number, params?: Record<string, unknown>) => 
+//   api.get(`/users/${userId}/path-enrollments`, { params }),
+// getUserActivity: (userId: number, periodDays: number = 30) => 
+//   api.get(`/users/${userId}/activity`, { params: { period_days: periodDays } }),
+
+// v2
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN ENROLLMENT MANAGEMENT API
+// v2-FIXED: Deenroll body simplified to {reason}, consistent error handling.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Course Enrollments
+listCourseEnrollments: (params?: Record<string, unknown>) => 
+  api.get('/admin/enrollments/courses', { params }),
+
+listPathEnrollments: (params?: Record<string, unknown>) => 
+  api.get('/admin/enrollments/paths', { params }),
+
+// FIXED: Body is just {reason} — user_id comes from the auth token
+deenrollFromCourse: (enrollmentId: number, reason?: string) => 
+  api.post(`/admin/enrollments/courses/${enrollmentId}/deenroll`, { reason }),
+
+deenrollFromPath: (pathEnrollmentId: number, reason?: string) => 
+  api.post(`/admin/enrollments/paths/${pathEnrollmentId}/deenroll`, { reason }),
+
+// Analytics
+getCourseAnalytics: (courseId: number, periodDays: number = 30) => 
+  api.get(`/admin/enrollments/analytics/courses/${courseId}`, { params: { period_days: periodDays } }),
+
+getPathAnalytics: (pathId: number, periodDays: number = 30) => 
+  api.get(`/admin/enrollments/analytics/paths/${pathId}`, { params: { period_days: periodDays } }),
+
+getGlobalAnalytics: (periodDays: number = 30) => 
+  api.get('/admin/enrollments/analytics/global', { params: { period_days: periodDays } }),
+
+// User Tracking (these are on the users router, not admin)
+getUserEnrollments: (userId: number, params?: Record<string, unknown>) => 
+  api.get(`/users/${userId}/enrollments`, { params }),
+
+getUserPathEnrollments: (userId: number, params?: Record<string, unknown>) => 
+  api.get(`/users/${userId}/path-enrollments`, { params }),
+
+getUserActivity: (userId: number, periodDays: number = 30) => 
+  api.get(`/users/${userId}/activity`, { params: { period_days: periodDays } }),
+
 };
 
 // ─── CREATOR ─────────────────────────────────────
