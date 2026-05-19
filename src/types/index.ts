@@ -396,6 +396,8 @@ export interface PathCreatePayload {
   pay_as_you_go_enabled?: boolean;
   pay_as_you_go_fee?: number;
   access_period_days?: number;
+  installment_count?: number;
+  installment_fee?: number;
   what_you_achieve?: string;
 
   instructor_led_only?: boolean;

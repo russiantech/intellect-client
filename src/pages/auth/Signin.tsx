@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { authApi } from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
+import OAuthButtons from '@/components/auth/OAuthButtons';
 
 export default function Signin() {
   const { login } = useAuth();
@@ -10,7 +11,7 @@ export default function Signin() {
   const location = useLocation();
   const from = (location.state as any)?.from?.pathname || null;
 
-  const [form, setForm] = useState({ email: '', password: '', remember_me: false });
+  const [form, setForm] = useState({ identifier: '', password: '', remember_me: false });
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
 
@@ -18,7 +19,7 @@ export default function Signin() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email || !form.password) return toast.error('Please fill in all fields');
+    if (!form.identifier || !form.password) return toast.error('Please fill in all fields');
     setLoading(true);
     try {
       const res = await authApi.signin(form);
@@ -34,14 +35,13 @@ export default function Signin() {
       navigate(dest, { replace: true });
       toast.success(`Welcome back, ${user.name || user.username}!`);
     } catch (err: any) {
-      // toast.error(err.response?.data?.detail || 'Invalid credentials');
-      const detail = err.response?.data?.message 
-    || err.response?.data?.detail 
-    || err.response?.data?.errors?.detail 
-    || err.message 
-    || 'Sign in failed';
-    toast.error(detail);
-
+      const detail =
+        err.response?.data?.message
+        || err.response?.data?.detail
+        || err.response?.data?.errors?.detail
+        || (typeof err.message === 'string' ? err.message : JSON.stringify(err.message))
+        || 'Sign in failed';
+      toast.error(detail);
     } finally { setLoading(false); }
   };
 
@@ -84,7 +84,6 @@ export default function Signin() {
       {/* Right panel */}
       <div className="auth-right">
         <div>
-          {/* Logo */}
           <Link to="/" className="nav-logo d-inline-flex mb-5" style={{ fontSize: '1.6rem' }}>
             <img src="/assets/images/logos/favicon.svg" alt="Intellect Logo" style={{ width: '2rem', height: '2rem', marginRight: '0.5rem' }} />
             Intellect
@@ -97,15 +96,17 @@ export default function Signin() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} noValidate>
+          <OAuthButtons mode="signin" />
+
+          <form onSubmit={handleSubmit} noValidate className="mt-2">
             <div className="mb-3 filled form-group">
-              <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>Email Address</label>
+              <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>Email, Username or Phone</label>
               <div className="position-relative">
-                <i className="bi bi-envelope position-absolute" style={{ left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--primary)', zIndex: 2 }} />
+                <i className="bi bi-person position-absolute" style={{ left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--primary)', zIndex: 2 }} />
                 <input
-                  type="email" className="form-control" placeholder="you@example.com"
-                  value={form.email} onChange={e => set('email', e.target.value)}
-                  style={{ paddingLeft: '2.5rem' }} autoComplete="email"
+                  type="text" className="form-control" placeholder="you@example.com or chrisjames"
+                  value={form.identifier} onChange={e => set('identifier', e.target.value)}
+                  style={{ paddingLeft: '2.5rem' }} autoComplete="username"
                 />
               </div>
             </div>
@@ -125,7 +126,6 @@ export default function Signin() {
                 <button type="button" onClick={() => setShowPw(p => !p)} className="nav-icon-btn" style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}>
                   <i className={`bi ${showPw ? 'bi-eye-slash' : 'bi-eye'}`} />
                 </button>
-
               </div>
             </div>
 

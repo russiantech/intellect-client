@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { authApi } from '@/services/api';
+import OAuthButtons from '@/components/auth/OAuthButtons';
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -38,13 +39,17 @@ export default function Signup() {
         password: form.password,
       });
 
-      // Store session data for the verify page
       sessionStorage.setItem('verification_data', JSON.stringify(res.data));
 
       toast.success('Verification code sent to your email!');
       navigate('/auth/verify-signup');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || err.response?.data?.detail || 'Registration failed');
+      const detail =
+        err.response?.data?.message
+        || err.response?.data?.detail
+        || (typeof err.message === 'string' ? err.message : JSON.stringify(err.message))
+        || 'Registration failed';
+      toast.error(detail);
     } finally {
       setLoading(false);
     }
@@ -95,8 +100,8 @@ export default function Signup() {
               <Link to="/auth/signin" className="fw-600 border pe-2 rounded-pill">Sign in</Link>
             </p>
           </div>
-
-          <form onSubmit={handleSubmit} noValidate>
+          
+          <form onSubmit={handleSubmit} noValidate className="mt-2">
             <div className="row">
               {/* Full name */}
               <div className="col-12 mb-3">
@@ -184,6 +189,8 @@ export default function Signup() {
                 : 'Create Account'}
             </button>
           </form>
+              
+            <OAuthButtons />
 
           <p className="text-muted text-center mt-3" style={{ fontSize: '0.75rem' }}>
             By signing up, you agree to our{' '}

@@ -60,14 +60,11 @@ export const authApi = {
   verifySignup: (data: any)                => api.post('/auth/signup/verify-signup', data),
   resendVerificationCode: (data: any)      => api.post('/auth/signup/resend', data),
   signin:             (data: any)          => api.post('/auth/signin', data),
+  getOAuthProviders:  ()                   => api.get('/auth/oauth/providers'),
+  getOAuthUrl:  (provider: string)         => api.get(`/auth/oauth/${provider}`),
+  getMe:              ()                   => api.get('/auth/me'),
   signout:            ()                   => api.post('/auth/signout'),
-  // verifyEmail:        (token: string)   => api.post('/auth/verify-email', { token }),
-
   forgotPassword:     (email: string)      => api.post('/auth/forgot-password', { email }),
-  // resetPassword:      (data: any)          => api.post('/auth/reset-password', data),
-  // v2
-  // forgotPassword: (data: { email: string }) => api.post('/auth/forgot-password', data),
-
   resetPassword: (data: { token: string; email_code: string; new_password: string }) =>
     api.post('/auth/reset-password', data),
 
@@ -79,6 +76,7 @@ export const authApi = {
   // resendVerification: ()                => api.post('/auth/resend-verification'),
   // resendVerificationCode: ()            => api.post('/auth/resend'),
   me:                 ()                   => api.get('/auth/me'),
+  
 };
 
 // ─── USERS ────────────────────────────────────────

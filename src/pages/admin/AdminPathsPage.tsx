@@ -762,7 +762,7 @@ import { LearningPath, Course, PathCreatePayload } from '@/types';
 import { Spinner, Empty, PageTitle, Modal, StatusBadge } from '@/components/shared/index';
 
 /* ── Types ──────────────────────────────────────────────────────────── */
-
+/*
 interface FormState {
   title:                 string;
   description:           string;
@@ -796,6 +796,66 @@ const DEFAULT_FORM: FormState = {
   access_period_days:    30,
   what_you_achieve:      '',
 };
+*/
+
+// v2
+// ════════════════════════════════════════════════════════════════════════════
+// 1. FormState  (replace existing interface + DEFAULT_FORM)
+// ════════════════════════════════════════════════════════════════════════════
+
+export interface FormState {
+  title:                 string;
+  description:           string;
+  fee:                   number;            // one-time price (also fallback)
+  payment_type:          string;            // primary / default model shown first
+  course_ids:            number[];
+  issues_certificate:    boolean;
+  duration_weeks:        number | undefined;
+  instructor_led_fee:    number;
+  instructor_led_only:   boolean;
+  what_you_achieve:      string;
+ 
+  // Subscription
+  subscription_enabled:  boolean;
+  subscription_interval: string;
+  subscription_fee:      number | undefined; // undefined → not configured
+ 
+  // Pay-as-you-go
+  payg_enabled:          boolean;
+  pay_as_you_go_fee:     number | undefined;
+  access_period_days:    number;
+ 
+  // Installment
+  installment_enabled:   boolean;
+  installment_count:     number | undefined;
+  installment_fee:       number | undefined;
+}
+ 
+const DEFAULT_FORM: FormState = {
+  title:                 '',
+  description:           '',
+  fee:                   0,
+  payment_type:          'one_time',
+  course_ids:            [],
+  issues_certificate:    true,
+  duration_weeks:        undefined,
+  instructor_led_fee:    0,
+  instructor_led_only:   false,
+  what_you_achieve:      '',
+ 
+  subscription_enabled:  false,
+  subscription_interval: 'monthly',
+  subscription_fee:      undefined,
+ 
+  payg_enabled:          false,
+  pay_as_you_go_fee:     undefined,
+  access_period_days:    30,
+ 
+  installment_enabled:   false,
+  installment_count:     undefined,
+  installment_fee:       undefined,
+};
+
 
 /* ── Injected CSS ───────────────────────────────────────────────────── */
 
@@ -934,7 +994,252 @@ function PaymentModelBadge({ p }: { p: LearningPath }) {
 
 /* ══════════════════════════════════════════════════════════════════════
    Component
-   ══════════════════════════════════════════════════════════════════════ */
+  ══════════════════════════════════════════════════════════════════════ */
+
+const PaymentConfigSection = ({ form, set }: { form: FormState; set: Function }) => (
+  <>
+    {/* ── Section header ── */}
+    <div className="col-12 mt-1">
+      <h6 className="text-primary mb-0">
+        <i className="bi bi-credit-card me-1" />Payment Configuration
+      </h6>
+      <hr className="mt-2 mb-0" />
+    </div>
+ 
+    {/* ── Primary model + Base price ── */}
+    <div className="col-md-4">
+      <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>
+        Primary / Default Model
+      </label>
+      <select
+        className="form-select"
+        value={form.payment_type}
+        onChange={e => {
+          set('payment_type', e.target.value);
+          if (e.target.value === 'free') {
+            // Clear all model toggles when switching to free
+            set('subscription_enabled', false);
+            set('payg_enabled', false);
+            set('installment_enabled', false);
+          }
+        }}
+      >
+        <option value="free">Free</option>
+        <option value="one_time">One-time</option>
+        <option value="subscription">Subscription</option>
+        <option value="pay_as_you_go">Pay-as-you-go</option>
+        <option value="installment">Instalment Plan</option>
+      </select>
+      <div className="form-text">Shown first on the detail page</div>
+    </div>
+ 
+    {form.payment_type !== 'free' && (
+      <div className="col-md-4">
+        <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>
+          Base / One-time Price (₦)
+        </label>
+        <input
+          type="number" className="form-control" min={0}
+          value={form.fee}
+          onChange={e => set('fee', Number(e.target.value))}
+        />
+        <div className="form-text">Used as fallback when a model's own fee is not set</div>
+      </div>
+    )}
+ 
+    {/* ── Instructor-led fee ── */}
+    {form.payment_type !== 'free' && (
+      <div className="col-md-4">
+        <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>
+          Instructor-led Add-on (₦)
+        </label>
+        <input
+          type="number" className="form-control" min={0}
+          value={form.instructor_led_fee}
+          onChange={e => {
+            const val = Number(e.target.value);
+            set('instructor_led_fee', val);
+            if (val === 0) set('instructor_led_only', false);
+          }}
+        />
+        <div className="form-text">0 = option not offered</div>
+      </div>
+    )}
+ 
+    {form.instructor_led_fee > 0 && (
+      <div className="col-12">
+        <div
+          className="d-flex align-items-start gap-2 p-3 rounded"
+          style={{ background: 'var(--primary-light,#eff6ff)', border: '1px solid var(--primary-border,#bfdbfe)' }}
+        >
+          <input
+            className="form-check-input mt-0 flex-shrink-0" type="checkbox"
+            id="ilOnly" checked={form.instructor_led_only}
+            onChange={e => set('instructor_led_only', e.target.checked)}
+          />
+          <label htmlFor="ilOnly" className="mb-0" style={{ cursor: 'pointer', fontSize: '0.8rem' }}>
+            <span className="fw-600">Instructor-led only</span>
+            <span className="text-muted d-block" style={{ fontSize: '0.75rem', marginTop: 2 }}>
+              Self-paced enrolment is disabled — students must choose instructor-led.
+            </span>
+          </label>
+        </div>
+      </div>
+    )}
+ 
+    {/* ═══════════════════════════════════════════════════════════════════
+        Additional billing models — shown when not free
+        Each model has its own enable toggle + fee fields.
+        Multiple can be active simultaneously.
+    ════════════════════════════════════════════════════════════════════ */}
+ 
+    {form.payment_type !== 'free' && (
+      <div className="col-12 mt-2">
+        <label className="form-label fw-600 d-block mb-2" style={{ fontSize: '0.8rem' }}>
+          Additional Billing Options
+          <span className="text-muted fw-400 ms-1">— students may choose any enabled option</span>
+        </label>
+        <div className="d-flex flex-column gap-3">
+ 
+          {/* ── Subscription ── */}
+          <div className="border rounded p-3">
+            <div className="form-check mb-0">
+              <input
+                className="form-check-input" type="checkbox"
+                id="subEnabled" checked={form.subscription_enabled}
+                onChange={e => set('subscription_enabled', e.target.checked)}
+              />
+              <label className="form-check-label fw-600" htmlFor="subEnabled" style={{ fontSize: '0.82rem' }}>
+                Subscription (recurring)
+              </label>
+            </div>
+ 
+            {form.subscription_enabled && (
+              <div className="row g-2 mt-2">
+                <div className="col-md-4">
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Billing Interval</label>
+                  <select
+                    className="form-select form-select-sm"
+                    value={form.subscription_interval}
+                    onChange={e => set('subscription_interval', e.target.value)}
+                  >
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly">Yearly</option>
+                  </select>
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>
+                    Subscription Fee (₦)
+                    <span className="text-muted ms-1">(optional)</span>
+                  </label>
+                  <input
+                    type="number" className="form-control form-control-sm" min={0}
+                    placeholder={form.fee > 0 ? `e.g. ${Math.round(form.fee * 0.9)}` : 'e.g. 4500'}
+                    value={form.subscription_fee ?? ''}
+                    onChange={e =>
+                      set('subscription_fee', e.target.value !== '' ? Number(e.target.value) : undefined)
+                    }
+                  />
+                  <div className="form-text" style={{ fontSize: '0.7rem' }}>Leave blank to use base price</div>
+                </div>
+              </div>
+            )}
+          </div>
+ 
+          {/* ── Pay-as-you-go ── */}
+          <div className="border rounded p-3">
+            <div className="form-check mb-0">
+              <input
+                className="form-check-input" type="checkbox"
+                id="paygEnabled" checked={form.payg_enabled}
+                onChange={e => set('payg_enabled', e.target.checked)}
+              />
+              <label className="form-check-label fw-600" htmlFor="paygEnabled" style={{ fontSize: '0.82rem' }}>
+                Pay-as-you-go (per period)
+              </label>
+            </div>
+ 
+            {form.payg_enabled && (
+              <div className="row g-2 mt-2">
+                <div className="col-md-4">
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Access Period (days)</label>
+                  <input
+                    type="number" className="form-control form-control-sm" min={1}
+                    value={form.access_period_days}
+                    onChange={e => set('access_period_days', Number(e.target.value))}
+                  />
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>
+                    Per-period Fee (₦)
+                    <span className="text-muted ms-1">(optional)</span>
+                  </label>
+                  <input
+                    type="number" className="form-control form-control-sm" min={0}
+                    placeholder={form.fee > 0 ? String(form.fee) : 'e.g. 2000'}
+                    value={form.pay_as_you_go_fee ?? ''}
+                    onChange={e =>
+                      set('pay_as_you_go_fee', e.target.value !== '' ? Number(e.target.value) : undefined)
+                    }
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+ 
+          {/* ── Instalment plan ── */}
+          <div className="border rounded p-3">
+            <div className="form-check mb-0">
+              <input
+                className="form-check-input" type="checkbox"
+                id="instEnabled" checked={form.installment_enabled}
+                onChange={e => set('installment_enabled', e.target.checked)}
+              />
+              <label className="form-check-label fw-600" htmlFor="instEnabled" style={{ fontSize: '0.82rem' }}>
+                Instalment / Payment Plan
+              </label>
+            </div>
+ 
+            {form.installment_enabled && (
+              <div className="row g-2 mt-2">
+                <div className="col-md-4">
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Number of Instalments</label>
+                  <input
+                    type="number" className="form-control form-control-sm" min={2}
+                    placeholder="e.g. 3"
+                    value={form.installment_count ?? ''}
+                    onChange={e =>
+                      set('installment_count', e.target.value !== '' ? Number(e.target.value) : undefined)
+                    }
+                  />
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Per-instalment Fee (₦)</label>
+                  <input
+                    type="number" className="form-control form-control-sm" min={0}
+                    placeholder="e.g. 5000"
+                    value={form.installment_fee ?? ''}
+                    onChange={e =>
+                      set('installment_fee', e.target.value !== '' ? Number(e.target.value) : undefined)
+                    }
+                  />
+                  {form.installment_count && form.installment_fee && (
+                    <div className="form-text" style={{ fontSize: '0.7rem' }}>
+                      Total: ₦{(form.installment_count * form.installment_fee).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+ 
+        </div>
+      </div>
+    )}
+  </>
+);
 
 export default function AdminPathsPage() {
   const [paths,       setPaths]       = useState<LearningPath[]>([]);
@@ -997,6 +1302,7 @@ export default function AdminPathsPage() {
 
   const openEdit = (p: LearningPath) => {
     setEditPath(p);
+    /*
     const existingIds: number[] =
       p.course_ids ?? (Array.isArray(p.courses) ? p.courses.map(c => c.id) : []);
     setForm({
@@ -1014,7 +1320,41 @@ export default function AdminPathsPage() {
       pay_as_you_go_fee:     p.pay_as_you_go_fee,
       access_period_days:    p.access_period_days ?? 30,
       what_you_achieve:      p.what_you_achieve || '',
+    }); */
+
+    // v2
+     const existingIds: number[] =
+      p.course_ids ?? (Array.isArray(p.courses) ? p.courses.map((c: any) => c.id) : []);
+ 
+    const subFee  = (p as any).subscription_fee  ?? undefined;
+    const paygFee = (p as any).pay_as_you_go_fee ?? undefined;
+    const instFee = (p as any).installment_fee   ?? undefined;
+ 
+    setForm({
+      title:                 p.title,
+      description:           p.description || '',
+      fee:                   p.fee ?? 0,
+      payment_type:          p.payment_type || 'one_time',
+      course_ids:            existingIds,
+      issues_certificate:    p.issues_certificate ?? true,
+      duration_weeks:        p.duration_weeks,
+      instructor_led_fee:    p.instructor_led_fee ?? 0,
+      instructor_led_only:   (p as any).instructor_led_only ?? false,
+      what_you_achieve:      p.what_you_achieve || '',
+ 
+      subscription_enabled:  Boolean(subFee != null && subFee > 0),
+      subscription_interval: p.subscription_interval || 'monthly',
+      subscription_fee:      subFee,
+ 
+      payg_enabled:          Boolean(paygFee != null && paygFee > 0),
+      pay_as_you_go_fee:     paygFee,
+      access_period_days:    p.access_period_days ?? 30,
+ 
+      installment_enabled:   Boolean(instFee != null && instFee > 0),
+      installment_count:     (p as any).installment_count ?? undefined,
+      installment_fee:       instFee,
     });
+
     setCourseSearch('');
     setShowModal(true);
   };
@@ -1030,7 +1370,7 @@ export default function AdminPathsPage() {
     setForm(prev => ({ ...prev, [key]: value }));
 
   /* ── Validation ───────────────────────────────────────────────────── */
-  const validate = (): string | null => {
+  /*const validate = (): string | null => {
     if (!form.title.trim()) return 'Title is required';
     if (form.fee < 0)       return 'Base fee cannot be negative';
     if (form.instructor_led_fee < 0) return 'Instructor-led fee cannot be negative';
@@ -1064,6 +1404,44 @@ export default function AdminPathsPage() {
       return 'Set an instructor-led fee before enabling instructor-led only mode';
 
     return null;
+  }; */
+
+  // v2
+  const validate = (): string | null => {
+    if (!form.title.trim()) return 'Title is required';
+    if (form.fee < 0)       return 'Base fee cannot be negative';
+    if (form.instructor_led_fee < 0) return 'Instructor-led fee cannot be negative';
+ 
+    const isFree    = form.payment_type === 'free';
+    const ilOnly    = form.instructor_led_only;
+ 
+    // Must have at least one active billing model (or be free / IL-only)
+    const hasOneTime = !isFree && form.fee > 0;
+    const hasSub     = form.subscription_enabled && form.subscription_fee != null;
+    const hasPayg    = form.payg_enabled && form.pay_as_you_go_fee != null;
+    const hasInst    = form.installment_enabled &&
+                       form.installment_fee != null && form.installment_count != null;
+ 
+    if (!isFree && !ilOnly && !hasOneTime && !hasSub && !hasPayg && !hasInst) {
+      return 'Configure at least one billing option with a price, or set the path to Free';
+    }
+ 
+    if (form.subscription_enabled && form.subscription_fee == null && form.fee === 0) {
+      return 'Enter a subscription fee (or a base price as fallback)';
+    }
+    if (form.payg_enabled && form.pay_as_you_go_fee == null && form.fee === 0) {
+      return 'Enter a per-period fee (or a base price as fallback)';
+    }
+    if (form.installment_enabled) {
+      if (!form.installment_fee)  return 'Enter an instalment fee';
+      if (!form.installment_count || form.installment_count < 2)
+        return 'Instalment plan requires at least 2 payments';
+    }
+    if (ilOnly && form.instructor_led_fee === 0) {
+      return 'Set an instructor-led fee before enabling instructor-led only mode';
+    }
+ 
+    return null;
   };
 
   /* ── Save ─────────────────────────────────────────────────────────── */
@@ -1073,7 +1451,8 @@ export default function AdminPathsPage() {
 
     setSaving(true);
     try {
-      const payload: PathCreatePayload = {
+
+      /*const payload: PathCreatePayload = {
         title:               form.title.trim(),
         description:         form.description || undefined,
         fee:                 form.payment_type === 'free' ? 0 : form.fee,
@@ -1094,6 +1473,44 @@ export default function AdminPathsPage() {
           form.payment_type === 'pay_as_you_go' ? form.pay_as_you_go_fee : undefined,
         access_period_days:
           form.payment_type === 'pay_as_you_go' ? form.access_period_days : undefined,
+      };
+      */
+    //  v2
+    const isFree = form.payment_type === 'free';
+ 
+      const payload: PathCreatePayload = {
+        title:               form.title.trim(),
+        description:         form.description || undefined,
+        fee:                 isFree ? 0 : form.fee,
+        payment_type:        form.payment_type,
+        course_ids:          form.course_ids,
+        issues_certificate:  form.issues_certificate,
+        duration_weeks:      form.duration_weeks || undefined,
+        instructor_led_fee:  form.instructor_led_fee || 0,
+        instructor_led_only: form.instructor_led_only,
+        what_you_achieve:    form.what_you_achieve || undefined,
+ 
+        // ── Always send ALL configured fee fields ──────────────────────────
+        // Backend _derive_payment_types() uses fee > 0 as the gate; it does
+        // NOT gate on payment_type or boolean flags.
+        subscription_interval: form.subscription_enabled
+          ? form.subscription_interval
+          : undefined,
+        subscription_fee: isFree || !form.subscription_enabled
+          ? undefined
+          : form.subscription_fee,
+ 
+        pay_as_you_go_fee: isFree || !form.payg_enabled
+          ? undefined
+          : form.pay_as_you_go_fee,
+        access_period_days: form.payg_enabled ? form.access_period_days : undefined,
+ 
+        installment_count: isFree || !form.installment_enabled
+          ? undefined
+          : form.installment_count,
+        installment_fee: isFree || !form.installment_enabled
+          ? undefined
+          : form.installment_fee,
       };
 
       if (editPath) {
@@ -1367,175 +1784,7 @@ export default function AdminPathsPage() {
           </div>
 
           {/* ── Payment Configuration ── */}
-          <div className="col-12 mt-1">
-            <h6 className="text-primary mb-0">
-              <i className="bi bi-credit-card me-1" />Payment Configuration
-            </h6>
-            <hr className="mt-2 mb-0" />
-          </div>
-
-          {/* Payment model selector */}
-          <div className="col-md-4">
-            <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>Payment Model</label>
-            <select
-              className="form-select"
-              value={form.payment_type}
-              onChange={e => {
-                // Reset model-specific fees when switching types so no stale data leaks
-                set('payment_type', e.target.value);
-                if (e.target.value === 'free') {
-                  set('subscription_fee', undefined);
-                  set('pay_as_you_go_fee', undefined);
-                }
-              }}
-            >
-              <option value="free">Free</option>
-              <option value="one_time">One-time Payment</option>
-              <option value="subscription">Subscription (recurring)</option>
-              <option value="pay_as_you_go">Pay-as-you-go (per period)</option>
-            </select>
-          </div>
-
-          {/* Base price — shown for all paid types; optional for sub/PAYG */}
-          {form.payment_type !== 'free' && (
-            <div className="col-md-4">
-              <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>
-                Base Price (₦)
-                {(form.payment_type === 'subscription' || form.payment_type === 'pay_as_you_go') ? (
-                  <span className="text-muted fw-400 ms-1">(optional fallback)</span>
-                ) : (
-                  <span className="text-danger ms-1">*</span>
-                )}
-              </label>
-              <input
-                type="number" className="form-control" min={0}
-                value={form.fee}
-                onChange={e => set('fee', Number(e.target.value))}
-              />
-              {(form.payment_type === 'subscription' || form.payment_type === 'pay_as_you_go') && (
-                <div className="form-text">
-                  Used when the specific fee below is not set
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Instructor-led fee */}
-          <div className="col-md-4">
-            <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>
-              Instructor-led Fee (₦)
-            </label>
-            <input
-              type="number" className="form-control" min={0}
-              value={form.instructor_led_fee}
-              onChange={e => {
-                const val = Number(e.target.value);
-                set('instructor_led_fee', val);
-                if (val === 0) set('instructor_led_only', false);
-              }}
-            />
-            <div className="form-text">0 = option not offered to students</div>
-          </div>
-
-          {/* Instructor-led only toggle — only when IL fee > 0 */}
-          {form.instructor_led_fee > 0 && (
-            <div className="col-12">
-              <div
-                className="d-flex align-items-start gap-2 p-3 rounded"
-                style={{
-                  background: 'var(--primary-light, #eff6ff)',
-                  border: '1px solid var(--primary-border, #bfdbfe)',
-                }}
-              >
-                <input
-                  className="form-check-input mt-0 flex-shrink-0"
-                  type="checkbox"
-                  id="ilOnly"
-                  checked={form.instructor_led_only}
-                  onChange={e => set('instructor_led_only', e.target.checked)}
-                />
-                <label htmlFor="ilOnly" className="mb-0" style={{ cursor: 'pointer', fontSize: '0.8rem' }}>
-                  <span className="fw-600">Instructor-led only</span>
-                  <span className="text-muted d-block" style={{ fontSize: '0.75rem', marginTop: 2 }}>
-                    Students must select instructor-led to enroll.
-                    Self-paced enrollment is disabled.
-                  </span>
-                </label>
-              </div>
-            </div>
-          )}
-
-          {/* ── Subscription extras ── */}
-          {form.payment_type === 'subscription' && (
-            <>
-              <div className="col-md-4">
-                <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>
-                  Billing Interval
-                </label>
-                <select
-                  className="form-select"
-                  value={form.subscription_interval}
-                  onChange={e => set('subscription_interval', e.target.value)}
-                >
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                  <option value="yearly">Yearly</option>
-                </select>
-              </div>
-              <div className="col-md-4">
-                <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>
-                  Subscription Fee (₦)
-                  <span className="text-muted fw-400 ms-1">(optional)</span>
-                </label>
-                <input
-                  type="number" className="form-control" min={0}
-                  placeholder={form.fee > 0 ? `e.g. ${Math.round(form.fee * 0.9)}` : 'e.g. 4500'}
-                  value={form.subscription_fee ?? ''}
-                  onChange={e =>
-                    set('subscription_fee', e.target.value !== '' ? Number(e.target.value) : undefined)
-                  }
-                />
-                <div className="form-text">
-                  Overrides base price for recurring charges
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* ── Pay-as-you-go extras ── */}
-          {form.payment_type === 'pay_as_you_go' && (
-            <>
-              <div className="col-md-4">
-                <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>
-                  Access Period (days)
-                </label>
-                <input
-                  type="number" className="form-control" min={1}
-                  value={form.access_period_days}
-                  onChange={e => set('access_period_days', Number(e.target.value))}
-                />
-                <div className="form-text">Days of access unlocked per payment</div>
-              </div>
-              <div className="col-md-4">
-                <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>
-                  Per-period Fee (₦)
-                  <span className="text-muted fw-400 ms-1">(optional)</span>
-                </label>
-                <input
-                  type="number" className="form-control" min={0}
-                  placeholder={form.fee > 0 ? String(form.fee) : 'e.g. 2000'}
-                  value={form.pay_as_you_go_fee ?? ''}
-                  onChange={e =>
-                    set('pay_as_you_go_fee', e.target.value !== '' ? Number(e.target.value) : undefined)
-                  }
-                />
-                <div className="form-text">
-                  Overrides base price per access window
-                </div>
-              </div>
-            </>
-          )}
+          <PaymentConfigSection form={form} set={set} />
 
           {/* Certificate toggle */}
           <div className="col-12">

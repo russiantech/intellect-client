@@ -105,10 +105,11 @@ export default function Footer() {
 
         <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
           <p className="text-muted mb-0" style={{ fontSize: '0.8rem' }}>
-            © {year} Intellect. All rights reserved.
+            © {year} <Link to="https://techa.salesnet.ng" className="text-primary btn-sm fw-600"> Intellect • Techa </Link>. All rights reserved.
           </p>
           <p className="text-muted mb-0" style={{ fontSize: '0.8rem' }}>
-            Built with <i className="bi bi-heart-fill text-danger" style={{ fontSize: '0.7rem' }} /> for learning
+            Built with <i className="bi bi-heart-fill text-danger" style={{ fontSize: '0.7rem' }} /> for learning - 
+            <Link to="https://techa.salesnet.ng" className="text-primary btn-sm fw-600">Russian Developers</Link>.
           </p>
         </div>
       </div>

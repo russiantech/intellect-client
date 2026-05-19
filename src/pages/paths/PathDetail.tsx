@@ -1,24 +1,12 @@
 // pages/paths/PathDetail.tsx
 /**
- * PathDetail — payment-type fix
+ * PathDetail — multi-payment-type student choice
  *
- * What was wrong
- * ─────────────────────────────────────────────────────────────────────────
- * 1. isFree  — `fee === 0` is NOT sufficient to determine free enrollment.
- *    A subscription or pay_as_you_go path whose generic `fee` column is 0
- *    would show "Free" and bypass Paystack.  Only payment_type === 'free'
- *    is truly free.
- *
- * 2. derivePaymentOptions  — was always reading the generic `.fee` column.
- *    For subscription paths the real charge is in `subscription_fee`; for
- *    pay_as_you_go it is in `pay_as_you_go_fee`.  These fields are now
- *    returned by the backend and used here.
- *
- * 3. User choice  — when the backend returns available_payment_types with
- *    multiple entries (e.g. both subscription and one_time are offered), the
- *    PaymentTypeSelector pill-switcher shows all options.  Each option now
- *    carries the correct fee so prices update correctly on switch.
- * ─────────────────────────────────────────────────────────────────────────
+ * Students now see a pill for every billing model configured by the admin:
+ *   Free / One-time / Monthly / Pay-as-you-go
+ * Selecting a pill updates price, description, CTA label, discount field
+ * and the includes list in real time.  handleEnroll receives the chosen
+ * payment_type so the backend creates the right Paystack transaction.
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -36,27 +24,113 @@ import { resolveImage } from '@/utils/resolveImage';
 import '@/styles/pages/paths/PathDetail.css';
 
 /* ═══════════════════════════════════════════════════════════════════════
-   Pure helpers
+   Helpers
    ═══════════════════════════════════════════════════════════════════════ */
 
 function mediaUrl(p: string | null | undefined) {
   return resolveImage(p, undefined, 'paths/thumbnails') ?? undefined;
 }
 
+const INTERVAL_LABELS: Record<string, string> = {
+  weekly: 'Weekly', monthly: 'Monthly',
+  quarterly: 'Quarterly', yearly: 'Yearly',
+};
+
 function paymentTypeLabel(type: string, interval?: string): string {
   switch (type) {
     case 'free':          return 'Free';
     case 'one_time':      return 'One-time';
-    case 'subscription': {
-      const map: Record<string, string> = {
-        weekly: 'Weekly', monthly: 'Monthly',
-        quarterly: 'Quarterly', yearly: 'Yearly',
-      };
-      return map[(interval ?? 'monthly').toLowerCase()] ?? 'Subscription';
-    }
+    case 'subscription':  return INTERVAL_LABELS[(interval ?? 'monthly').toLowerCase()] ?? 'Subscription';
     case 'pay_as_you_go': return 'Pay-as-you-go';
     default:              return type;
   }
+}
+
+/**
+ * Build every billing option the student can choose.
+ *
+ * Fee columns are the source of truth; available_payment_types is used
+ * only for label / metadata enrichment.  This works whether or not the
+ * backend has been updated to populate available_payment_types fully.
+ *
+ *   fee > 0              → One-time option
+ *   subscription_fee > 0 → Subscription option
+ *   pay_as_you_go_fee > 0→ Pay-as-you-go option
+ *   payment_type='free'  → Free only
+ */
+function derivePaymentOptions(path: LearningPath): PaymentOption[] {
+  const type = (path.payment_type ?? 'one_time') as string;
+
+  if (type === 'free') {
+    return [{ payment_type: 'free', fee: 0, label: 'Free' }];
+  }
+
+  // Metadata enrichment lookup
+  const meta: Record<string, any> = {};
+  ((path as any).available_payment_types ?? []).forEach((r: any) => {
+    meta[r.payment_type] = r;
+  });
+
+  const options: PaymentOption[] = [];
+
+  // ── One-time ──────────────────────────────────────────────────────────
+  const baseFee = Number(path.fee || 0);
+  if (baseFee > 0) {
+    options.push({
+      payment_type: 'one_time',
+      fee:          meta.one_time?.fee ?? baseFee,
+      label:        meta.one_time?.label ?? 'One-time',
+    });
+  }
+
+  // ── Subscription ──────────────────────────────────────────────────────
+  const subFee = Number((path as any).subscription_fee || 0);
+  if (subFee > 0) {
+    const interval = (
+      meta.subscription?.subscription_interval ??
+      (path as any).subscription_interval ??
+      'monthly'
+    ).toLowerCase();
+    options.push({
+      payment_type:          'subscription',
+      fee:                   meta.subscription?.fee ?? subFee,
+      subscription_interval: interval,
+      label:                 meta.subscription?.label ?? (INTERVAL_LABELS[interval] ?? 'Subscription'),
+    });
+  }
+
+  // ── Pay-as-you-go ─────────────────────────────────────────────────────
+  const paygFee = Number((path as any).pay_as_you_go_fee || 0);
+  if (paygFee > 0) {
+    const days = Number(
+      meta.pay_as_you_go?.access_period_days ??
+      (path as any).access_period_days ??
+      30
+    );
+    options.push({
+      payment_type:       'pay_as_you_go',
+      fee:                meta.pay_as_you_go?.fee ?? paygFee,
+      access_period_days: days,
+      label:              meta.pay_as_you_go?.label ?? 'Pay-as-you-go',
+    });
+  }
+
+  // Fallback — use available_payment_types or primary type
+  if (options.length === 0) {
+    const raw: any[] = (path as any).available_payment_types ?? [];
+    if (raw.length > 0) {
+      return raw.map((r: any) => ({
+        payment_type:          r.payment_type,
+        fee:                   Number(r.fee ?? 0),
+        subscription_interval: r.subscription_interval ?? undefined,
+        access_period_days:    r.access_period_days    ?? undefined,
+        label:                 r.label ?? paymentTypeLabel(r.payment_type, r.subscription_interval),
+      }));
+    }
+    return [{ payment_type: type, fee: baseFee, label: paymentTypeLabel(type) }];
+  }
+
+  return options;
 }
 
 function paymentDescription(opt: PaymentOption): string {
@@ -77,59 +151,8 @@ function paymentDescription(opt: PaymentOption): string {
   }
 }
 
-/**
- * Derive selectable billing options from the path API response.
- *
- * Priority order:
- *  1. path.available_payment_types[]  — returned by backend when configured
- *  2. Individual type fields           — synthesised fallback
- *
- * CRITICAL: each option's `fee` must be the ACTUAL charge for that billing
- * model, not the generic `path.fee` column.
- *   subscription  → subscription_fee  (fallback: fee)
- *   pay_as_you_go → pay_as_you_go_fee (fallback: fee)
- *   one_time      → fee
- *   free          → 0
- */
-function derivePaymentOptions(path: LearningPath): PaymentOption[] {
-  const raw: any[] = (path as any).available_payment_types ?? [];
-  if (raw.length > 0) {
-    return raw.map((r: any) => ({
-      payment_type:          r.payment_type,
-      fee:                   Number(r.fee ?? 0),
-      subscription_interval: r.subscription_interval,
-      access_period_days:    r.access_period_days,
-      label:                 paymentTypeLabel(r.payment_type, r.subscription_interval),
-    }));
-  }
-
-  // Fallback: synthesise from individual fields
-  const type = path.payment_type ?? 'one_time';
-  let fee: number;
-
-  if (type === 'free') {
-    fee = 0;
-  } else if (type === 'subscription') {
-    // subscription_fee is the recurring charge; fall back to fee
-    fee = Number((path as any).subscription_fee || path.fee || 0);
-  } else if (type === 'pay_as_you_go') {
-    // pay_as_you_go_fee is the per-window charge; fall back to fee
-    fee = Number((path as any).pay_as_you_go_fee || path.fee || 0);
-  } else {
-    fee = Number(path.fee || 0);
-  }
-
-  return [{
-    payment_type:          type,
-    fee,
-    subscription_interval: (path as any).subscription_interval,
-    access_period_days:    (path as any).access_period_days ?? 30,
-    label:                 paymentTypeLabel(type, (path as any).subscription_interval),
-  }];
-}
-
 /* ═══════════════════════════════════════════════════════════════════════
-   Sub-components — outside PathDetailView so they are never remounted
+   Sub-components — outside PathDetailView to avoid remounting
    ═══════════════════════════════════════════════════════════════════════ */
 
 function PaymentTypeSelector({
@@ -180,6 +203,14 @@ function PriceBlock({
   const discountedBase = discountInfo?.valid ? discountInfo.final_price : selectedPayment.fee;
   const total          = discountedBase + (instructorLed ? instructorLedFee : 0);
 
+  // Period suffix for recurring billing models
+  const periodSuffix =
+    selectedPayment.payment_type === 'subscription'
+      ? `/ ${selectedPayment.subscription_interval ?? 'month'}`
+      : selectedPayment.payment_type === 'pay_as_you_go'
+      ? `/ ${selectedPayment.access_period_days ?? 30} days`
+      : '';
+
   if (isFree && !instructorLed) {
     return (
       <div className="pd-price-block">
@@ -193,18 +224,15 @@ function PriceBlock({
     );
   }
 
-  // Billing period suffix for compact display
-  const periodSuffix = selectedPayment.payment_type === 'subscription'
-    ? `/${selectedPayment.subscription_interval ?? 'month'}`
-    : selectedPayment.payment_type === 'pay_as_you_go'
-    ? `/${selectedPayment.access_period_days ?? 30} days`
-    : '';
-
   return (
     <div className="pd-price-block">
       <span className="pd-price-main">
         ₦{total.toLocaleString()}
-        <span className="pd-price-period">{periodSuffix}</span>
+        {periodSuffix && (
+          <span className="pd-price-period" style={{ fontSize: '0.7em', fontWeight: 400, marginLeft: '0.2em', opacity: 0.7 }}>
+            {periodSuffix}
+          </span>
+        )}
         {(discountInfo?.valid || instructorLed) && (
           <span className="pd-price-original">₦{selectedPayment.fee.toLocaleString()}</span>
         )}
@@ -269,7 +297,7 @@ function CtaButton({
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   PathDetailView — rendered only once path is loaded
+   PathDetailView
    ═══════════════════════════════════════════════════════════════════════ */
 
 function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }) {
@@ -296,6 +324,7 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
     checkDiscount,
     handleEnroll,
     totalPrice,
+    isFree,
   } = useEnrollmentPayment({
     itemId:          pathId,
     itemType:        'path',
@@ -306,7 +335,7 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
     navigate,
   });
 
-  /* Redirect-callback safety net (Paystack appends ?reference= on mobile) */
+  /* Redirect-callback safety net — Paystack appends ?reference= on mobile */
   useEffect(() => {
     const ref = searchParams.get('reference') || searchParams.get('trxref');
     if (!ref) return;
@@ -316,35 +345,33 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
 
   if (!selectedPayment) return <Spinner />;
 
-  /**
-   * isFree — ONLY when payment_type is explicitly 'free'.
-   * Do NOT use `fee === 0` here; subscription/PAYG courses whose fee
-   * column is 0 (base price not set, billing via subscription_fee /
-   * pay_as_you_go_fee) must go through the paid Paystack flow.
-   */
-  const isFree     = selectedPayment.payment_type === 'free';
   const isEnrolled = !!path.is_enrolled;
   const isReady    = (path.courses_count ?? 0) > 0;
   const progress   = (path as any).progress_pct ?? 0;
   const thumbSrc   = mediaUrl(path.thumbnail);
 
+  // Includes list adapts to the selected billing model
   const includes = [
     { icon: 'bi-collection', label: `${path.courses_count ?? 0} courses` },
     { icon: 'bi-award',      label: 'Certificate on completion' },
     { icon: 'bi-phone',      label: 'Mobile & desktop access' },
-    ...(path.duration_weeks ? [{ icon: 'bi-clock', label: `${path.duration_weeks} weeks` }] : []),
+    ...(path.duration_weeks
+      ? [{ icon: 'bi-clock', label: `${path.duration_weeks} weeks` }]
+      : []),
     ...(selectedPayment.payment_type === 'one_time'
       ? [{ icon: 'bi-infinity', label: 'Lifetime access' }]
       : []),
     ...(selectedPayment.payment_type === 'pay_as_you_go'
       ? [{ icon: 'bi-arrow-repeat', label: `${selectedPayment.access_period_days ?? 30}-day access windows` }]
       : []),
+    ...(selectedPayment.payment_type === 'subscription'
+      ? [{ icon: 'bi-arrow-repeat', label: `Renews ${selectedPayment.subscription_interval ?? 'monthly'}` }]
+      : []),
   ];
 
   return (
     <div className="pd-root fade-in">
 
-      {/* Breadcrumb */}
       <nav className="pd-breadcrumb" aria-label="Breadcrumb">
         <ol className="breadcrumb">
           <li className="breadcrumb-item"><Link to="/">Home</Link></li>
@@ -453,7 +480,6 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
             </div>
           )}
         </div>
-        {/* ── end col-lg-8 ── */}
 
         {/* ════ Sidebar ════ */}
         <div className="col-lg-4">
@@ -473,7 +499,7 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
 
             <div className="pd-enroll-body">
 
-              {/* Payment type selector — multi-option pill switcher */}
+              {/* ── Payment type pills — unenrolled + ready ── */}
               {!isEnrolled && isReady && (
                 <PaymentTypeSelector
                   options={paymentOptions}
@@ -482,11 +508,12 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
                     setSelectedPayment(opt);
                     setDiscountInfo(null);
                     setDiscountCode('');
+                    setInstructorLed(false);
                   }}
                 />
               )}
 
-              {/* Price + CTA */}
+              {/* ── Price + CTA ── */}
               <div className="pd-price-cta-row">
                 <PriceBlock
                   selectedPayment={selectedPayment}
@@ -507,7 +534,7 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
                 />
               </div>
 
-              {/* Instructor-led toggle */}
+              {/* ── Instructor-led toggle ── */}
               {hasInstructorOption && !isEnrolled && isReady && (
                 <div className="pd-instructor-led-toggle">
                   <label htmlFor="pd-il-toggle" className="pd-il-label">
@@ -527,7 +554,7 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
                         </span>
                       </div>
                       <div className="pd-il-desc">
-                        Get live sessions and direct feedback from an instructor.
+                        Live sessions &amp; direct feedback from an instructor.
                         Additional fee per{' '}
                         {selectedPayment.payment_type === 'one_time' ? 'enrollment' : 'billing period'}.
                       </div>
@@ -536,7 +563,7 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
                 </div>
               )}
 
-              {/* Not-ready notice */}
+              {/* ── Not-ready notice ── */}
               {!isReady && !isEnrolled && (
                 <div className="pd-not-ready">
                   <i className="bi bi-hourglass-split" />
@@ -547,7 +574,7 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
                 </div>
               )}
 
-              {/* Discount code — only for paid types */}
+              {/* ── Discount code — only for paid types ── */}
               {!isFree && !isEnrolled && isReady && (
                 <div className="pd-discount-row">
                   <input
@@ -570,7 +597,7 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
                 </div>
               )}
 
-              {/* Includes */}
+              {/* ── Includes ── */}
               <div className="pd-includes">
                 {includes.map((item, i) => (
                   <div key={i} className="pd-include-item">
@@ -581,7 +608,6 @@ function PathDetailView({ path, pathId }: { path: LearningPath; pathId: number }
             </div>
           </div>
         </div>
-        {/* ── end col-lg-4 ── */}
 
       </div>
 
@@ -645,4 +671,3 @@ export default function PathDetail() {
 
   return <PathDetailView key={path.id} path={path} pathId={path.id} />;
 }
-

@@ -1,5 +1,3 @@
-
-
 // v2
 /**
  * CourseDetail.tsx  v5
@@ -107,273 +105,104 @@ function paymentDescription(opt: PaymentOption): string {
   }
 }
 
+const INTERVAL_LABELS: Record<string, string> = {
+  weekly: 'Weekly', monthly: 'Monthly',
+  quarterly: 'Quarterly', yearly: 'Yearly',
+};
+
 /**
- * Derive the selectable payment options from the course object.
- * Prefers course.available_payment_types[] if the API returns it;
- * otherwise synthesises a single-item list from the course's own fields
- * so the pill-switcher UI is always consistent.
+ * Build every billing option the student can choose.
+ *
+ * Strategy — fee columns are the source of truth, available_payment_types
+ * is used only for label / metadata enrichment:
+ *
+ *   fee > 0              → One-time option
+ *   subscription_fee > 0 → Subscription option
+ *   pay_as_you_go_fee > 0→ Pay-as-you-go option
+ *   payment_type='free'  → Free only, nothing else
+ *
+ * This means the selector works correctly regardless of whether the backend
+ * has been updated to return a full available_payment_types array — it reads
+ * the individual fee columns that have always been in the response.
  */
-/*
 function derivePaymentOptions(course: Course): PaymentOption[] {
-  const raw: any[] = (course as any).available_payment_types ?? [];
-  if (raw.length > 0) {
-    return raw.map((r: any) => ({
-      payment_type:          r.payment_type,
-      fee:                   r.fee ?? 0,
-      subscription_interval: r.subscription_interval,
-      access_period_days:    r.access_period_days,
-      label:                 paymentTypeLabel(r.payment_type, r.subscription_interval),
-    }));
-  }
-  return [{
-    payment_type:          course.payment_type,
-    fee:                   course.fee,
-    subscription_interval: (course as any).subscription_interval,
-    access_period_days:    (course as any).access_period_days ?? 30,
-    label:                 paymentTypeLabel(course.payment_type, (course as any).subscription_interval),
-  }];
-}
-*/
-// v2
-// ═══════════════════════════════════════════════════════════════════════════
-// CHANGE 1 of 4 — derivePaymentOptions (~line 116)
-//
-// Replace the existing derivePaymentOptions function with this version.
-// The fallback branch now reads subscription_fee / pay_as_you_go_fee from
-// the course object (returned by the updated backend _course_dict) instead
-// of always using the generic `fee` column.
-// ═══════════════════════════════════════════════════════════════════════════
-
-function derivePaymentOptions(course: Course): PaymentOption[] {
-  const raw: any[] = (course as any).available_payment_types ?? [];
-  if (raw.length > 0) {
-    return raw.map((r: any) => ({
-      payment_type:          r.payment_type,
-      fee:                   Number(r.fee ?? 0),
-      subscription_interval: r.subscription_interval,
-      access_period_days:    r.access_period_days,
-      label:                 paymentTypeLabel(r.payment_type, r.subscription_interval),
-    }));
-  }
- 
-  // Fallback: synthesise from individual course fields
   const type = course.payment_type ?? 'one_time';
-  let fee: number;
- 
+
+  // Free courses — nothing else to offer
   if (type === 'free') {
-    fee = 0;
-  } else if (type === 'subscription') {
-    // subscription_fee is the recurring charge; fall back to fee
-    fee = Number((course as any).subscription_fee || course.fee || 0);
-  } else if (type === 'pay_as_you_go') {
-    // pay_as_you_go_fee is the per-window charge; fall back to fee
-    fee = Number((course as any).pay_as_you_go_fee || course.fee || 0);
-  } else {
-    fee = Number(course.fee || 0);
+    return [{ payment_type: 'free', fee: 0, label: 'Free' }];
   }
- 
-  return [{
-    payment_type:          type,
-    fee,
-    subscription_interval: (course as any).subscription_interval,
-    access_period_days:    (course as any).access_period_days ?? 30,
-    label:                 paymentTypeLabel(type, (course as any).subscription_interval),
-  }];
+
+  // Build a metadata lookup from available_payment_types for enriching
+  // labels / intervals — but do NOT use it as the sole option source.
+  const meta: Record<string, any> = {};
+  ((course as any).available_payment_types ?? []).forEach((r: any) => {
+    meta[r.payment_type] = r;
+  });
+
+  const options: PaymentOption[] = [];
+
+  // ── One-time ──────────────────────────────────────────────────────────
+  const baseFee = Number(course.fee || 0);
+  if (baseFee > 0) {
+    options.push({
+      payment_type: 'one_time',
+      fee:          meta.one_time?.fee ?? baseFee,
+      label:        meta.one_time?.label ?? 'One-time',
+    });
+  }
+
+  // ── Subscription ──────────────────────────────────────────────────────
+  const subFee = Number((course as any).subscription_fee || 0);
+  if (subFee > 0) {
+    const interval = (
+      meta.subscription?.subscription_interval ??
+      (course as any).subscription_interval ??
+      'monthly'
+    ).toLowerCase();
+    options.push({
+      payment_type:          'subscription',
+      fee:                   meta.subscription?.fee ?? subFee,
+      subscription_interval: interval,
+      label:                 meta.subscription?.label ?? (INTERVAL_LABELS[interval] ?? 'Subscription'),
+    });
+  }
+
+  // ── Pay-as-you-go ─────────────────────────────────────────────────────
+  const paygFee = Number((course as any).pay_as_you_go_fee || 0);
+  if (paygFee > 0) {
+    const days = Number(
+      meta.pay_as_you_go?.access_period_days ??
+      (course as any).access_period_days ??
+      30
+    );
+    options.push({
+      payment_type:       'pay_as_you_go',
+      fee:                meta.pay_as_you_go?.fee ?? paygFee,
+      access_period_days: days,
+      label:              meta.pay_as_you_go?.label ?? 'Pay-as-you-go',
+    });
+  }
+
+  // Fallback — nothing resolved from individual columns; use whatever
+  // available_payment_types gave us, or the primary type as last resort.
+  if (options.length === 0) {
+    const raw: any[] = (course as any).available_payment_types ?? [];
+    if (raw.length > 0) {
+      return raw.map((r: any) => ({
+        payment_type:          r.payment_type,
+        fee:                   Number(r.fee ?? 0),
+        subscription_interval: r.subscription_interval ?? undefined,
+        access_period_days:    r.access_period_days    ?? undefined,
+        label:                 r.label ?? paymentTypeLabel(r.payment_type, r.subscription_interval),
+      }));
+    }
+    return [{ payment_type: type, fee: baseFee, label: paymentTypeLabel(type) }];
+  }
+
+  return options;
 }
- 
-/* ═══════════════════════════════════════════════════════════
-   usePaystackInline
-   ───────────────────────────────────────────────────────────
-   Loads the Paystack inline-js v2 SDK from their CDN exactly
-   once (idempotent). Exposes a single openPaystack() call
-   that opens the in-page popup using a pre-created access_code.
-   Falls back to window.location redirect if the SDK hasn't
-   loaded by the time the user clicks.
-   ═══════════════════════════════════════════════════════════ */
-// function usePaystackInline() {
-//   const sdkReady = useRef(false);
 
-//   useEffect(() => {
-//     // Already loaded (hot-reload / StrictMode double-run guard)
-//     if (sdkReady.current || (window as any).PaystackPop) {
-//       sdkReady.current = true;
-//       return;
-//     }
-//     const script    = document.createElement('script');
-//     script.src      = 'https://js.paystack.co/v2/inline.js';
-//     script.async    = true;
-//     script.onload   = () => { sdkReady.current = true; };
-//     script.onerror  = () => console.warn('[Paystack] inline SDK failed to load — will use redirect fallback');
-//     document.body.appendChild(script);
-//   }, []);
-
-//   /**
-//    * Open the Paystack popup.
-//    * @param authorizationUrl  Redirect fallback URL (used only when SDK is absent)
-//    * @param accessCode        Pre-created transaction access_code from /payments/initiate
-//    * @param onSuccess         Called with the transaction reference on payment success
-//    * @param onClose           Called when the user dismisses the popup without paying
-//    */
-//   const openPaystack = useCallback((
-//     authorizationUrl: string,
-//     accessCode:       string,
-//     onSuccess:        (reference: string) => void,
-//     onClose:          () => void,
-//   ) => {
-//     const Pop = (window as any).PaystackPop;
-//     if (!Pop || !accessCode) {
-//       // SDK not available or no access_code — redirect flow
-//       window.location.href = authorizationUrl;
-//       return;
-//     }
-//     const handler = Pop.setup({
-//       // Paystack v2 inline identifies the transaction via access_code,
-//       // not by re-specifying amount/email/key here.
-//       accessCode,
-//       onSuccess: (transaction: any) => {
-//         onSuccess(transaction.reference ?? transaction.trxref ?? '');
-//       },
-//       onCancel: onClose,
-//     });
-//     handler.openIframe();
-//   }, []);
-
-//   return { openPaystack };
-// }
-
-  // v2
-
-/*  function usePaystackInline() {
-  const sdkReady = useRef(false);
-
-  useEffect(() => {
-    if (sdkReady.current || (window as any).PaystackPop) {
-      sdkReady.current = true;
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = 'https://js.paystack.co/v2/inline.js';
-    script.async = true;
-    script.onload = () => { sdkReady.current = true; };
-    script.onerror = () => console.warn('[Paystack] inline SDK failed to load');
-    document.body.appendChild(script);
-  }, []);
-
-  const openPaystack = useCallback((
-    authorizationUrl: string,
-    accessCode: string,
-    onSuccess: (reference: string) => void,
-    onClose: () => void,
-  ) => {
-    const PaystackPop = (window as any).PaystackPop;
-    if (!PaystackPop || !accessCode) {
-      window.location.href = authorizationUrl;
-      return;
-    }
-
-    try {
-      // v2 API: instantiate then resumeTransaction
-      const popup = new PaystackPop();
-      popup.resumeTransaction(accessCode)
-        .then((transaction: any) => {
-          // Transaction completed (success or failure)
-          if (transaction.status === 'success') {
-            onSuccess(transaction.reference || transaction.trxref || '');
-          } else {
-            onClose(); // User cancelled or failed
-          }
-        })
-        .catch((err: any) => {
-          console.error('[Paystack] transaction error:', err);
-          onClose();
-        });
-    } catch (err) {
-      console.error('[Paystack] resumeTransaction failed:', err);
-      window.location.href = authorizationUrl;
-    }
-  }, []);
-
-  return { openPaystack };
-}
-*/
-
-// v3
-/*
-function usePaystackInline() {
-  const sdkReady = useRef(false);
-
-  useEffect(() => {
-    // Prevent duplicate script loads
-    if (sdkReady.current || (window as any).PaystackPop) {
-      sdkReady.current = true;
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://js.paystack.co/v1/inline.js';
-    script.async = true;
-
-    script.onload = () => {
-      sdkReady.current = true;
-      console.log('[Paystack] SDK loaded');
-    };
-
-    script.onerror = () => {
-      console.error('[Paystack] SDK failed to load');
-    };
-
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  const openPaystack = useCallback(
-    (
-      email: string,
-      amount: number,
-      publicKey: string,
-      reference: string,
-      onSuccess: (reference: string) => void,
-      onClose: () => void
-    ) => {
-      const PaystackPop = (window as any).PaystackPop;
-
-      if (!PaystackPop) {
-        toast.error('Payment SDK failed to load');
-        return;
-      }
-
-      try {
-        const handler = PaystackPop.setup({
-          key: publicKey,
-          email,
-          amount: Math.round(amount * 100), // Kobo
-          ref: reference,
-
-          callback: function (response: any) {
-            onSuccess(response.reference);
-          },
-
-          onClose: function () {
-            onClose();
-          },
-        });
-
-        handler.openIframe();
-
-      } catch (err) {
-        console.error('[Paystack] popup error:', err);
-        toast.error('Could not start payment');
-      }
-    },
-    []
-  );
-
-  return { openPaystack };
-}
-*/
 
 // v4
 function usePaystackInline() {
@@ -743,12 +572,19 @@ const handleEnroll = async () => {
     //   selectedPayment.payment_type === 'free' ||
     //   Number(totalPrice) <= 0
     // ) {
+
     // v2
-        if (selectedPayment.payment_type === 'free') {
+    //     if (selectedPayment.payment_type === 'free') {
+    // // Only explicitly free courses skip Paystack.
+    // // totalPrice <= 0 is NOT a safe free-enrollment trigger:
+    // // a misconfigured subscription/PAYG with fee=0 would bypass payment.
+
+    // v3
+    if (selectedPayment.payment_type === 'free') {
     // Only explicitly free courses skip Paystack.
-    // totalPrice <= 0 is NOT a safe free-enrollment trigger:
-    // a misconfigured subscription/PAYG with fee=0 would bypass payment.
- 
+    // DO NOT fall back to `totalPrice <= 0` — a subscription/PAYG whose
+    // generic fee column is 0 must go through the paid flow
+
       await enrollmentsApi.enroll(course.id);
 
       toast.success('Enrolled successfully!');
@@ -913,11 +749,10 @@ const handleEnroll = async () => {
   /* ── Derived values ── */
   // const isFree     = selectedPayment.payment_type === 'free' || selectedPayment.fee === 0;
   // v2
-  const isFree = selectedPayment.payment_type === 'free';
-  // NOTE: Do NOT use `selectedPayment.fee === 0` here.
-  // A subscription or pay_as_you_go course whose generic fee column is 0
-  // (because its actual charge lives in subscription_fee / pay_as_you_go_fee)
-  // must go through the Paystack paid flow, not silently enroll for free.
+    const isFree = selectedPayment.payment_type === 'free';
+  // fee === 0 is NOT a safe free-enrollment signal.  A subscription course
+  // whose primary fee column is 0 (billing via subscription_fee) would
+  // silently bypass Paystack without this fix.
  
  
   const isEnrolled = !!course.is_enrolled;
@@ -937,7 +772,8 @@ const handleEnroll = async () => {
 
   const learnItems   = (course.what_you_learn ?? '').split('\n').map(s => s.trim()).filter(Boolean);
   const requirements = (course.requirements   ?? '').split('\n').map(s => s.trim()).filter(Boolean);
-
+  
+  /*
   const includes = [
     { icon: 'bi-collection',        label: `${course.lessons_count ?? 0} lessons`  },
     { icon: 'bi-file-earmark-play', label: `${course.topics_count  ?? 0} topics`   },
@@ -949,6 +785,35 @@ const handleEnroll = async () => {
       : []),
     { icon: 'bi-phone', label: 'Mobile & desktop access' },
     { icon: 'bi-award', label: 'Certificate on completion' },
+  ];*/
+
+    const includes = [
+    { icon: 'bi-collection',        label: `${course.lessons_count ?? 0} lessons`  },
+    { icon: 'bi-file-earmark-play', label: `${course.topics_count  ?? 0} topics`   },
+    ...(course.duration_weeks
+      ? [{ icon: 'bi-clock', label: `${course.duration_weeks} weeks` }]
+      : []),
+    // Show lifetime access only for one-time payments
+    ...(selectedPayment.payment_type === 'one_time'
+      ? [{ icon: 'bi-infinity', label: 'Lifetime access' }]
+      : []),
+    // Show access window for PAYG
+    ...(selectedPayment.payment_type === 'pay_as_you_go'
+      ? [{ icon: 'bi-arrow-repeat',
+           label: `${(course as any).access_period_days ?? selectedPayment.access_period_days ?? 30}-day access windows` }]
+      : []),
+    // Show renewal cadence for subscription
+    ...(selectedPayment.payment_type === 'subscription'
+      ? [{ icon: 'bi-arrow-repeat',
+           label: `Renews ${selectedPayment.subscription_interval ?? 'monthly'}` }]
+      : []),
+    // Topic throttle for PAYG/subscription
+    ...(selectedPayment.payment_type === 'pay_as_you_go' && (course as any).weekly_topic_limit
+      ? [{ icon: 'bi-bar-chart-steps',
+           label: `Up to ${(course as any).weekly_topic_limit} topics/week` }]
+      : []),
+    { icon: 'bi-phone',  label: 'Mobile & desktop access' },
+    { icon: 'bi-award',  label: 'Certificate on completion' },
   ];
 
   /* ─────────────────────────────────────────────────────────────────────────
@@ -1024,16 +889,23 @@ const handleEnroll = async () => {
           )}
         </span>
 
-        {selectedPayment.payment_type === 'subscription' && (
+         {selectedPayment.payment_type === 'subscription' && (
           <div className="cd-price-type" style={{ marginTop: '0.1rem' }}>
-            per {selectedPayment.subscription_interval ?? 'month'}
+            per {selectedPayment.subscription_interval ?? 'month'} ·{' '}
+            <span style={{ fontWeight: 400, opacity: 0.8 }}>
+              cancel anytime
+            </span>
           </div>
         )}
         {selectedPayment.payment_type === 'pay_as_you_go' && (
           <div className="cd-price-type" style={{ marginTop: '0.1rem' }}>
-            per {selectedPayment.access_period_days ?? 30} days
+            per {selectedPayment.access_period_days ?? 30} days ·{' '}
+            <span style={{ fontWeight: 400, opacity: 0.8 }}>
+              renew when it expires
+            </span>
           </div>
         )}
+ 
 
         {discountInfo?.valid && (
           <div className="cd-price-savings">You save ₦{discountInfo.savings.toLocaleString()}</div>
@@ -1324,12 +1196,21 @@ const handleEnroll = async () => {
                 <PaymentTypeSelector
                   options={paymentOptions}
                   selected={selectedPayment}
+                 
+                  // onChange={opt => {
+                  //   setSelectedPayment(opt);
+                  //   setDiscountInfo(null);
+                  //   setDiscountCode('');
+                  // }}
+                  // v2
                   onChange={opt => {
-                    setSelectedPayment(opt);
-                    setDiscountInfo(null);
-                    setDiscountCode('');
-                  }}
-                />
+                setSelectedPayment(opt);
+                setDiscountInfo(null);   // ← clear applied discount
+                setDiscountCode('');
+                setInstructorLed(false); // ← reset instructor-led on type switch
+              }}
+
+              />
               )}
 
               {/* Price + CTA */}
