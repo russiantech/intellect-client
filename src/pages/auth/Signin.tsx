@@ -96,7 +96,7 @@ export default function Signin() {
             </p>
           </div>
 
-          <OAuthButtons mode="signin" />
+          <OAuthButtons />
 
           <form onSubmit={handleSubmit} noValidate className="mt-2">
             <div className="mb-3 filled form-group">
