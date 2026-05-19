@@ -96,8 +96,6 @@ export default function Signin() {
             </p>
           </div>
 
-          <OAuthButtons />
-
           <form onSubmit={handleSubmit} noValidate className="mt-2">
             <div className="mb-3 filled form-group">
               <label className="form-label fw-600" style={{ fontSize: '0.8rem' }}>Email, Username or Phone</label>
@@ -139,6 +137,8 @@ export default function Signin() {
               {loading ? <><span className="spinner-border spinner-border-sm me-2" />Signing in…</> : 'Sign In'}
             </button>
           </form>
+
+          <OAuthButtons />
 
           <div className="text-center mt-4 text-muted" style={{ fontSize: '0.75rem' }}>
             By signing in, you agree to our{' '}
