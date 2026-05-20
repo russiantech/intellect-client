@@ -390,8 +390,13 @@ export default function Instructors() {
       {/* ── Hero ── */}
       <div className="instructors-hero">
         <div className="instructors-hero-inner">
-          <p className="hero-eyebrow">Meet the Team</p>
-          <h1 className="hero-heading">Our Instructors</h1>
+          
+          {/* <p className="hero-eyebrow">Meet the Team</p> */}
+          <h1 className="hero-heading"><svg width={50} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="14" r="8" fill="#7c4dff" />
+                <circle cx="28" cy="26" r="8" fill="#f38207" />
+                <circle cx="30" cy="10" r="4" fill="#7c4dff" opacity="0.6" />
+              </svg> Explore Our Creators</h1>
           <p className="hero-sub">
             Learn from industry practitioners, certified educators and domain experts
             who bring real-world experience into every lesson.

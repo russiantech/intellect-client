@@ -15,7 +15,7 @@ const publicLinks: NavItem[] = [
   { to: '/', icon: 'bi-house', label: 'Home' },
   { to: '/explore', icon: 'bi-compass', label: 'Browse Courses' },
   { to: '/paths', icon: 'bi-signpost-split', label: 'Learning Paths' },
-  { to: '/instructors', icon: 'bi-people', label: 'Instructors' },
+  { to: '/instructors', icon: 'bi-people', label: 'Creators' },
   { to: '/about', icon: 'bi-info-circle', label: 'About Intellect' },
 ];
 
