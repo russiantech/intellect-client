@@ -23,7 +23,6 @@ const CourseDetail = lazy(() => import('@/pages/courses/CourseDetail'));
 const PathsPage    = lazy(() => import('@/pages/paths/PathsPage'));
 const PathDetail   = lazy(() => import('@/pages/paths/PathDetail'));
 
-// const InstructorsPage = lazy(() => import('@/pages/shared/Instructors'));
 const InstructorsPage = lazy(() => import('@/pages/public/Instructors'));
 const InstructorsProfile = lazy(() => import('@/pages/public/InstructorProfile'));
 
