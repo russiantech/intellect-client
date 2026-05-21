@@ -103,15 +103,32 @@ export default function Instructors() {
 //   const debounceRef = useRef<<ReturnType<<typeof setTimeout> | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // const fetchInstructors1 = (role: string, search: string, pg: number) => {
+  //   setLoading(true);
+  //   usersApi
+  //     .listInstructors({ role: role || undefined, search: search || undefined, page: pg, per_page: 24 })
+  //     .then(r => {
+  //       setInstructors(r.data.items || []);
+  //       setTotal(r.data.total || 0);
+  //     })
+  //     .catch(() => {})
+  //     .finally(() => setLoading(false));
+  // };
+
   const fetchInstructors = (role: string, search: string, pg: number) => {
     setLoading(true);
+    console.log('Fetching from:', usersApi.listInstructors); // Check what this resolves to
+    
     usersApi
       .listInstructors({ role: role || undefined, search: search || undefined, page: pg, per_page: 24 })
       .then(r => {
+        console.log('Response:', r.config?.baseURL, r.config?.url); // See actual URL used
         setInstructors(r.data.items || []);
         setTotal(r.data.total || 0);
       })
-      .catch(() => {})
+      .catch(err => {
+        console.error('Fetch error:', err.config?.baseURL, err.config?.url);
+      })
       .finally(() => setLoading(false));
   };
 
