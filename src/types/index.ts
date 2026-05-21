@@ -42,6 +42,27 @@ export interface User {
   projects?: {};
 }
 
+// 
+
+export interface Instructor {
+  id: number;
+  username: string;
+  name: string;
+  image?: string;
+  title?: string;
+  city?: string;
+  country?: string;
+  about?: string;
+  creator_bio?: string;
+  expertise?: string;
+  primary_role: string;
+  is_creator: boolean;
+  creator_approved: boolean;
+  is_online: boolean;
+  education?: any;
+  socials?: any;
+}
+
 export interface AuthState {
   user: User | null;
   access_token: string | null;
