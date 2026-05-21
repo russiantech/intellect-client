@@ -88,7 +88,7 @@ export const usersApi = {
     return api.post('/users/profile/avatar', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
   },
   getPublicProfile: (username: string)          => api.get(`/users/public/${username}`),
-  listInstructors:  (params?: any)              => api.get('/users/instructors/', {params}),
+  listInstructors:  (params?: any)              => api.get('/users/instructors', {params}),
   listUsers:        (params?: any)              => api.get('/users/', { params }),
   getUser:          (id: number)                => api.get(`/users/${id}`),
   adminUpdateUser:  (id: number, data: any)     => api.put(`/users/${id}/admin`, data),
