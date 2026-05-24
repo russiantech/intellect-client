@@ -1,0 +1,118 @@
+/* src/components/shared/ImpersonationBanner.css */
+
+.impersonation-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: white;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.impersonation-banner-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.impersonation-banner-icon {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.impersonation-banner-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.impersonation-banner-label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+}
+
+.impersonation-banner-target {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.impersonation-banner-target .text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+.impersonation-banner-role {
+  font-size: 0.75rem;
+  opacity: 0.85;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.impersonation-banner-revert {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  color: #4f46e5;
+  border-radius: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.impersonation-banner-revert:hover {
+  background: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Push content down when banner is visible */
+body:has(.impersonation-banner) {
+  padding-top: 48px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .impersonation-banner-content {
+    gap: 0.5rem;
+  }
+
+  .impersonation-banner-text {
+    font-size: 0.8rem;
+  }
+
+  .impersonation-banner-role {
+    display: none;
+  }
+}

@@ -660,7 +660,7 @@ export default function PathDetail() {
     setLoading(true);
     setError(false);
     pathsApi
-      .getBySlug(slug)
+      .get(slug)
       .then(r  => setPath(r.data))
       .catch(() => { setError(true); navigate('/paths'); })
       .finally(() => setLoading(false));

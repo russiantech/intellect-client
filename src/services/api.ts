@@ -54,6 +54,55 @@ api.interceptors.response.use(
   }
 );
 
+api.interceptors.response.use(
+  (res) => {
+    // Unwrap standard API wrapper: { success, message, timestamp?, data }
+    const payload = res.data;
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      !Array.isArray(payload) &&
+      'success' in payload &&
+      'data' in payload
+    ) {
+      res.data = payload.data;
+    }
+    return res;
+  },
+  async (err) => {
+    const { config } = err;
+
+    // Retry on timeout for GET requests (idempotent)
+    if (err.code === 'ECONNABORTED' && config.method === 'get' && !config.__retryCount) {
+      config.__retryCount = 1;
+      console.warn(`Retrying ${config.url} after timeout...`);
+      return api(config);
+    }
+
+    const original = err.config;
+    if (err.response?.status === 401 && !original._retry) {
+      original._retry = true;
+      const refresh = localStorage.getItem('refresh_token');
+      if (refresh) {
+        try {
+          const resp = await axios.post(`${BASE_URL}/auth/refresh`, {}, {
+            headers: { Authorization: `Bearer ${refresh}` },
+          });
+          const { access_token } = resp.data;
+          localStorage.setItem('access_token', access_token);
+          original.headers.Authorization = `Bearer ${access_token}`;
+          return api(original);
+        } catch {
+          localStorage.clear();
+          window.location.href = '/auth/signin';
+        }
+      }
+    }
+    return Promise.reject(err);
+  }
+);
+
+
 // ─── AUTH ─────────────────────────────────────────
 export const authApi = {
   signup:             (data: any)          => api.post('/auth/signup', data),
@@ -241,7 +290,7 @@ export const pathsApi = {
  * Add these to your existing api.ts file
  */
 
-// In your pathsApi object, add:
+/*
 export const pathsApi = {
   list: (params?: any) => api.get('/paths/', { params }),
 
@@ -260,6 +309,27 @@ export const pathsApi = {
   removeCourse: (pathId: number, courseId: number) => 
     api.delete(`/paths/${pathId}/courses/${courseId}`),
 };
+*/
+
+// v3
+export const pathsApi = {
+  list: (params?: any) => api.get('/paths/', { params }),
+
+  // Primary public endpoint
+  getBySlug: (slug: string) => api.get(`/paths/by-slug/${slug}`),
+
+  // Admin / backward-compat — was broken because it used raw axios
+  get: (slugOrId: string | number) => api.get(`/paths/${slugOrId}`),
+
+  create: (data: any) => api.post('/paths/', data),
+  update: (id: number, data: any) => api.put(`/paths/${id}`, data),
+  delete: (id: number) => api.delete(`/paths/${id}`),
+  addCourse: (pathId: number, courseId: number) => 
+    api.post(`/paths/${pathId}/courses/${courseId}`),
+  removeCourse: (pathId: number, courseId: number) => 
+    api.delete(`/paths/${pathId}/courses/${courseId}`),
+};
+
 
 // Also update your router to use slug:
 // In your React Router config:
