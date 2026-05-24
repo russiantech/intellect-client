@@ -420,6 +420,7 @@ export interface PathCreatePayload {
   installment_count?: number;
   installment_fee?: number;
   what_you_achieve?: string;
+  thumbnail?: string | null;
 
   instructor_led_only?: boolean;
 }
