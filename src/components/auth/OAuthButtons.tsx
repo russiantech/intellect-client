@@ -103,7 +103,6 @@
 
 // v2
 // src/components/auth/OAuthButtons.tsx
-// src/components/auth/OAuthButtons.tsx
 
 import { useEffect, useState } from 'react';
 import { authApi } from '@/services/api';
@@ -167,10 +166,10 @@ export default function OAuthButtons({
     const fetchProviders = async () => {
       try {
         const res = await authApi.getOAuthProviders();
-
+        // console.log('Fetched providers:', res.data);
         if (!mounted) return;
 
-        setProviders(res.data?.data || []);
+        setProviders(res?.data || []);
       } catch {
         if (mounted) setProviders([]);
       } finally {
