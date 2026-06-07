@@ -72,7 +72,7 @@ export function useOAuthPopup() {
 
     try {
       const res = await authApi.getOAuthUrl(provider);
-      const authUrl = res.data?.data?.authorization_url;
+      const authUrl = res.data?.authorization_url;
 
       if (authUrl) {
         popup.location.href = authUrl;

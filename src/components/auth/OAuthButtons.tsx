@@ -170,6 +170,7 @@ export default function OAuthButtons({
         if (!mounted) return;
 
         setProviders(res?.data || []);
+
       } catch {
         if (mounted) setProviders([]);
       } finally {
