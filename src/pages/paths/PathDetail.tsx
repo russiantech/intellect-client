@@ -22,6 +22,7 @@ import {
 } from '@/hooks/useEnrollmentPayment';
 import { resolveImage } from '@/utils/resolveImage';
 import '@/styles/pages/paths/PathDetail.css';
+import { usePageMeta, buildPathSchema, buildBreadcrumbSchema } from '@/hooks/usePageMeta';
 
 /* ═══════════════════════════════════════════════════════════════════════
    Helpers
@@ -654,6 +655,36 @@ export default function PathDetail() {
   const [path,    setPath]    = useState<LearningPath | null>(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(false);
+
+  /* ── Page meta (SEO, OG, Twitter Card, JSON-LD) ── */
+  usePageMeta({
+    title:       path?.title,
+    description: (path as any)?.description,
+    image:       (path as any)?.thumbnail,
+    keywords:    ['learning path', 'online learning', 'course bundle', 'Intellect'],
+    author:      (path as any)?.creator?.name,
+    type:        'website',
+    schema:  path
+      ? {
+          '@graph': [
+            buildPathSchema({
+              title:         path.title,
+              slug:          (path as any).slug,
+              description:   (path as any).description,
+              thumbnail:     (path as any).thumbnail,
+              courses_count: path.courses_count,
+              courses:       (path.courses as any[])?.map(c => ({ title: c.title, slug: c.slug })),
+            }),
+            buildBreadcrumbSchema([
+              { name: 'Home',  path: '/' },
+              { name: 'Paths', path: '/paths' },
+              { name: path.title, path: `/paths/${(path as any).slug}` },
+            ]),
+          ],
+          '@context': 'https://schema.org',
+        }
+      : null,
+  });
 
   useEffect(() => {
     if (!slug) return;

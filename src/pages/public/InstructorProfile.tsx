@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { usersApi } from '@/services/api';
 import { Avatar, Spinner } from '@/components/shared';
 import '@/styles/pages/instructors/InstructorProfile.css';
+import { usePageMeta, buildPersonSchema, buildBreadcrumbSchema, INTELLECT } from '@/hooks/usePageMeta';
 
 interface Project {
   id: string;
@@ -168,6 +169,45 @@ export default function InstructorProfile() {
   const [instructor, setInstructor] = useState<InstructorFull | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+
+  /* ── Page meta (SEO, OG, Twitter Card, JSON-LD) ── */
+  const roleLabel = instructor?.creator_approved && instructor?.is_creator
+    ? 'Verified Creator'
+    : instructor?.primary_role === 'tutor' ? 'Tutor' : 'Instructor';
+  const location  = [instructor?.city, instructor?.country].filter(Boolean).join(', ');
+
+  usePageMeta({
+    title:       instructor ? `${instructor.name} — ${roleLabel}` : null,
+    description: instructor
+      ? [
+          instructor.creator_bio || instructor.about,
+          instructor.title,
+          location,
+          `${roleLabel} on ${INTELLECT}`,
+        ].filter(Boolean).join(' · ').slice(0, 160)
+      : null,
+    image:    instructor?.image,
+    keywords: [
+      roleLabel,
+      ...(instructor?.expertise || '').split(/[,;|]+/).map(s => s.trim()).filter(Boolean).slice(0, 6),
+      'online instructor', INTELLECT,
+    ],
+    author: instructor?.name,
+    type:   'website',
+    schema: instructor
+      ? {
+          '@graph': [
+            buildPersonSchema(instructor),
+            buildBreadcrumbSchema([
+              { name: 'Home',        path: '/' },
+              { name: 'Instructors', path: '/instructors' },
+              { name: instructor.name, path: `/instructors/${instructor.username}` },
+            ]),
+          ],
+          '@context': 'https://schema.org',
+        }
+      : null,
+  });
 
   useEffect(() => {
     if (!username) return;
@@ -349,4 +389,3 @@ export default function InstructorProfile() {
     </div>
   );
 }
-

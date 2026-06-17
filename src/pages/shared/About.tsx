@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom';
+import { usePageMeta, buildOrganizationSchema } from '@/hooks/usePageMeta';
 
 export default function About() {
+  usePageMeta({
+    title:       'About Us',
+    description: 'Intellect is a digital learning platform building a future where learning fits seamlessly into everyday life — empowering individuals to acquire skills on their own terms.',
+    keywords:    ['about Intellect', 'online learning platform', 'e-learning Nigeria', 'course creators', 'digital education'],
+    schema:      buildOrganizationSchema(),
+  });
+
   const features = [
     { icon: 'bi-play-circle', title: 'Rich Content Types', desc: 'Video, PDF, PPT, audio, and interactive lessons — all in one platform.', color: 'blue' as const },
     { icon: 'bi-robot', title: 'AI Learning Assistant', desc: 'Get instant answers and personalized explanations right inside the player.', color: 'purple' as const },
@@ -40,4 +48,3 @@ export default function About() {
     </div>
   );
 }
-

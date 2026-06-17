@@ -41,6 +41,7 @@ import { useAuth } from '@/context/AuthContext';
 import { renderContent } from '@/pages/learning/LearnPage';
 import { resolveImage } from '@/utils/resolveImage';
 import '@/styles/pages/courses/CourseDetail.css';
+import { usePageMeta, buildCourseSchema, buildBreadcrumbSchema, INTELLECT } from '@/hooks/usePageMeta';
 
 /* ═══════════════════════════════════════════════════════════
    Types
@@ -399,6 +400,33 @@ export default function CourseDetail() {
   const [course,       setCourse]       = useState<Course | null>(null);
   const [loading,      setLoading]      = useState(true);
   const [enrolling,    setEnrolling]    = useState(false);
+
+  /* ── Page meta (SEO, OG, Twitter Card, JSON-LD) ── */
+  usePageMeta({
+    title:       course?.title,
+    description: course?.short_description,
+    image:       course?.thumbnail,
+    keywords:    [
+      ...(course?.categories?.map((c: any) => c.title) ?? []),
+      ...(course?.level ? [course.level] : []),
+      'online course', 'learn online', INTELLECT,
+    ],
+    author:  course?.creator?.name,
+    type:    'course',
+    schema:  course
+      ? {
+          '@graph': [
+            buildCourseSchema(course as any),
+            buildBreadcrumbSchema([
+              { name: 'Home',    path: '/' },
+              { name: 'Courses', path: '/explore' },
+              { name: course.title, path: `/courses/${course.slug}` },
+            ]),
+          ],
+          '@context': 'https://schema.org',
+        }
+      : null,
+  });
   const [openLesson,   setOpenLesson]   = useState<number | null>(0);
   const [discountCode, setDiscountCode] = useState('');
   const [discountInfo, setDiscountInfo] = useState<any>(null);
@@ -1364,3 +1392,4 @@ const handleEnroll = async () => {
     </div>
   );
 }
+
