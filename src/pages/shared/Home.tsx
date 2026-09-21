@@ -52,6 +52,8 @@ export default function Home() {
 
       {/* Categories */}
       {categories.length > 0 && (
+        <>
+          {/* {console.log(categories)} */}
         <div className="mb-5">
           <div className="d-flex align-items-center justify-content-between mb-3">
             <h2 className="small-title mb-0">Browse by Category</h2>
@@ -69,6 +71,7 @@ export default function Home() {
             ))}
           </div>
         </div>
+        </>
       )}
 
       {/* Featured Courses */}
